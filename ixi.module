@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * InDesign XML Importer file
+ *
+ * This modules allows for the upload of XML exported from InDesign to create
+ * new content nodes.
+ */
+
+/**
+ * Implement hook_help().
+ */
+function ixi_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#ixi':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Import XML from InDesign as new content nodes.') . '</p>';
+      return $output;
+  }
+}
