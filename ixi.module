@@ -20,3 +20,15 @@ function ixi_help($path, $arg) {
       return $output;
   }
 }
+
+/**
+ * Implement hook_permission().
+ */
+function ixi_permission() {
+  return array(
+    'administer xml import' => array(
+      'title' => t('Administer XML Import'),
+      'description' => t('Upload XML and create new content nodes with it.'),
+    ),
+  );
+}
