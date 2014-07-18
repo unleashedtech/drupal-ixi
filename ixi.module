@@ -17,6 +17,9 @@ function ixi_help($path, $arg) {
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('Import XML from InDesign as new content nodes.') . '</p>';
+      $output .= '<h3>' . t('Configuration') . '</h3>';
+      $output .= '<p>' . t('You select a group content type and fields and these fields are added into the upload form when uploading a new archive.') . '</p>';
+      $output .= '<p>' . t('Note that the fields that you select are generated as if they were in the add new content form.') . '</p>';
       return $output;
   }
 }
