@@ -1,0 +1,7 @@
+; Unleashed Technologies InDesign XML Importer (Upload)
+name = InDesign XML Importer Uploader
+description = Provides the functionality for uploading and processing InDesign XML.
+core = 7.x
+package = InDesign XML Importer
+
+dependencies[] = ixi

@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * InDesign XML Importer Uploader file
+ *
+ * Upload and process xml archives.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ixi_upload_menu() {
+  $items['admin/content/add/xml'] = array(
+    'title' => 'Import XML',
+    'description' => 'Upload and process an archive of XML files.',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('admin/content/add/xml/upload'),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/content/add/xml/upload'] = array(
+    'title' => 'Upload',
+    'description' => 'Upload and process an archive of XML files.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ixi_upload_upload_form'),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'ixi_upload.admin.inc',
+  );
+  $items['admin/content/add/xml/process'] = array(
+    'title' => 'Process',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ixi_upload_process_form'),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'ixi_upload.admin.inc',
+  );
+
+  return $items;
+}
