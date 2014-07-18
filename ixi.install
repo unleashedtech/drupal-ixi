@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * InDesign XML Importer file
+ *
+ * Install file for the xml importer.
+ */
+
+
+/**
+ * Implements hook_install().
+ */
+function ixi_install() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ixi_uninstall() {
+  variable_del('ixi_group_content_type');
+  variable_del('ixi_group_fields');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function ixi_requirements($phase) {
+  $requirements = array();
+  switch ($phase) {
+    case 'install': break;
+    case 'update': break;
+    case 'runtime': break;
+  }
+  return $requirements;
+}
