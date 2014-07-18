@@ -3,3 +3,5 @@ name = InDesign XML Importer
 description = Provides an admin interface for uploading and inserting InDesign XML as new content nodes.
 core = 7.x
 package = InDesign XML Importer
+
+configure = admin/config/ixi

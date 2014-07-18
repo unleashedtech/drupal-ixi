@@ -36,3 +36,19 @@ function ixi_permission() {
     ),
   );
 }
+
+/**
+ * Implements hook_menu().
+ */
+function ixi_menu() {
+  $items['admin/config/ixi'] = array(
+    'title' => 'XML Import',
+    'description' => 'Configure the InDesign XML Importer.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ixi_config_form'),
+    'access arguments' => array('administer xml import'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'ixi.admin.inc',
+  );
+  return $items;
+}
