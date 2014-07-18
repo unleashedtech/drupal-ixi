@@ -28,7 +28,11 @@ function ixi_permission() {
   return array(
     'administer xml import' => array(
       'title' => t('Administer XML Import'),
-      'description' => t('Upload XML and create new content nodes with it.'),
+      'description' => t('Configure the XML importer settings.'),
+    ),
+    'perform xml import' => array(
+      'title' => t('Perform XML Import'),
+      'description' => t('Upload and process an archive of XML files.'),
     ),
   );
 }
