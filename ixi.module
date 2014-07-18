@@ -9,7 +9,7 @@
  */
 
 /**
- * Implement hook_help().
+ * Implements hook_help().
  */
 function ixi_help($path, $arg) {
   switch ($path) {
@@ -22,7 +22,7 @@ function ixi_help($path, $arg) {
 }
 
 /**
- * Implement hook_permission().
+ * Implements hook_permission().
  */
 function ixi_permission() {
   return array(
