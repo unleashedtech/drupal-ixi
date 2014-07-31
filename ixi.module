@@ -20,6 +20,8 @@ function ixi_help($path, $arg) {
       $output .= '<h3>' . t('Configuration') . '</h3>';
       $output .= '<p>' . t('You select a group content type and fields and these fields are added into the upload form when uploading a new archive.') . '</p>';
       $output .= '<p>' . t('Note that the fields that you select are generated as if they were in the add new content form.') . '</p>';
+      $output .= '<h3>' . t('General Information') . '</h3>';
+      $output .= '<p>' . t('The module saves uploaded archives in the private files folder under &quot;ixi_archives&quot; so that they aren\'t exposed to the public prior to processing.') . '</p>';
       return $output;
   }
 }

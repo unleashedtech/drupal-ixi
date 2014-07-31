@@ -1,6 +1,14 @@
 Drupal InDesign XML Importer
 ============================
 
+Installation
+------------
+
+Upon installation the module will attempt to create the directory
+private://ixi_archives so that we do not expose uploaded archives to the
+public. If installation fails, check the permissions of the private files
+directory.
+
 Configuration
 -------------
 
