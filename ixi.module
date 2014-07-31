@@ -55,5 +55,13 @@ function ixi_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'ixi.admin.inc',
   );
+  $items['admin/reports/status/ixi/archive_directory'] = array(
+    'title' => 'Recreate archive directory',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ixi_recreate_archive_directory_form'),
+    'access arguments' => array('administer xml import'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ixi.admin.inc',
+  );
   return $items;
 }

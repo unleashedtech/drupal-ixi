@@ -42,7 +42,18 @@ function ixi_requirements($phase) {
       }
       break;
     case 'update': break;
-    case 'runtime': break;
+    case 'runtime':
+      $directory = 'private://ixi_archives';
+      if (!file_prepare_directory($directory)) {
+        $description = $t('The archive directory is missing or not writable. Please check %directory.', array('%directory' => $directory));
+        $requirements['ixi_archive_dir'] = array(
+          'title' => 'InDesign Archive Directory',
+          'description' => $description . ' ' . l(t('Recreate archive directory'), 'admin/reports/status/ixi/archive_directory'),
+          'value' => 'Missing or Not Writable',
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
   }
   return $requirements;
 }

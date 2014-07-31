@@ -49,3 +49,19 @@ function _ixi_get_content_type_fields($content_type) {
     return $fields;
   }
 }
+
+function ixi_recreate_archive_directory_form() {
+  return confirm_form(array(), t('Do you want to attempt to recreate the archives upload directory?'), 'admin/reports/status', t('This will attempt to recreate and make writable the upload archives directory: <em>%directory</em>.', array('%directory' => 'private://ixi_archives')), t('Recreate archive directory'), t('Cancel'));
+}
+
+function ixi_recreate_archive_directory_form_submit($form, &$form_state) {
+  _ixi_recreate_archive_directory();
+  $form_state['redirect'] = 'admin/reports/status';
+}
+
+function _ixi_recreate_archive_directory() {
+  $directory = 'private://ixi_archives';
+  if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+    drupal_set_message(t('Could not create the directory %directory.', array('%directory' => $directory)), 'error');
+  }
+}
