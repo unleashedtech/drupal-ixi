@@ -40,7 +40,6 @@ function ixi_upload_upload_form($form, &$form_state) {
     '#title' => t('Upload Archive'),
   );
   $form['archive']['fid'] = array(
-    // '#name' => 'files[fid]',
     // '#title' => t('File'),
     '#type' => 'file',
     '#description' => t('Upload a zip archive of XML files.'),
