@@ -17,15 +17,21 @@ function ixi_upload_upload_form($form, &$form_state) {
   $form['#parents'] = array(); // necessary for field_default_form() to not yell at us
   $entity_type = 'node';
   $bundle_name = variable_get('ixi_group_content_type');
-  $entity = $node;
+  $entity = NULL;
   $langcode = LANGUAGE_NONE;
+
+  $node_names = node_type_get_names();
+  $form['group_node'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('New @content_type', array('@content_type' => $node_names[variable_get('ixi_group_content_type')])),
+  );
 
   foreach (variable_get('ixi_group_fields') as $field_name) {
     $items = NULL;
     $field = field_info_field($field_name);
     $instance = field_info_instance($entity_type, $field_name, $bundle_name);
     $field_form = field_default_form($entity_type, $entity, $field, $instance, $langcode, $items, $form, $form_state);
-    $form += $field_form;
+    $form['group_node'] += $field_form;
   }
 
   return $form;
