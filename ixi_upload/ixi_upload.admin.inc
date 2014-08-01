@@ -64,6 +64,73 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
   else {
    drupal_set_message('File was not uploaded.', 'error');
   }
+
+  $operations[] = array(
+    '_ixi_upload_create_group_node',
+    array($form_state),
+  );
+
+  $found_files = array();
+
+  $zip = new ZipArchive();
+  if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+      $zip_file = $zip->statIndex($i);
+      if (strlen($zip_file['name']) < 8 || strcmp(substr($zip_file['name'], 0, 8), '__MACOSX')) {
+        $pathinfo = pathinfo($zip_file['name']);
+        if (isset($pathinfo['extension']) && !strcmp($pathinfo['extension'], 'xml')) {
+          $operations[] = array(
+            '_ixi_upload_unzip_xml_file',
+            array($file->fid, $pathinfo['basename'], $pathinfo['dirname']),
+          );
+        }
+      }
+    }
+    $zip->close();
+  }
+  else {
+    drupal_set_message('Could not open zip (zip error code: ' . $zip_return . ')', 'error');
+  }
+
+  $batch = array(
+    'title' => t('Unzipping archive...'),
+    'operations' => $operations,
+    'finished' => '_ixi_upload_upload_finished',
+    'file' => drupal_get_path('module', 'ixi_upload') . '/ixi_upload.admin.inc',
+  );
+
+  batch_set($batch);
+
+}
+
+function _ixi_upload_create_group_node($form_state, &$context) {
+  $context['results'][] = 'the new group node id';
+  $context['message'] = t('Creating the group node.');
+  sleep(2);
+}
+
+function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
+  $context['results'][] = $fid;
+  $context['message'] = t('Checking XML file %xml_filename.', array('%xml_filename' => $basename));
+  sleep(1);
+}
+
+function _ixi_upload_upload_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(t('@count results processed.', array('@count' => count($results))));
+    drupal_set_message(t('The final result was "%final"', array('%final' => end($results))));
+  }
+  else {
+    $error_operation = reset($operations);
+    drupal_set_message(
+      t('An error occurred while processing @operation with arguments: @args',
+        array(
+          '@operation' => $error_operation[0],
+          '@args' => print_r($error_operation[0], TRUE),
+        )
+      )
+    );
+  }
 }
 
 /**
@@ -73,4 +140,3 @@ function ixi_upload_process_form($form, &$form_state) {
   $form = array();
   return $form;
 }
-
