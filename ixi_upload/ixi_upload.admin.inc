@@ -14,6 +14,7 @@
  * information on including field forms in the form.
  */
 function ixi_upload_upload_form($form, &$form_state) {
+  $form['#attributes']['enctype'] = 'multipart/form-data';
   $form['#parents'] = array(); // necessary for field_default_form() to not yell at us
   $entity_type = 'node';
   $bundle_name = variable_get('ixi_group_content_type');
@@ -34,7 +35,36 @@ function ixi_upload_upload_form($form, &$form_state) {
     $form['group_node'] += $field_form;
   }
 
+  $form['archive'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Upload Archive'),
+  );
+  $form['archive']['fid'] = array(
+    // '#name' => 'files[fid]',
+    // '#title' => t('File'),
+    '#type' => 'file',
+    '#description' => t('Upload a zip archive of XML files.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Upload and Create'),
+  );
+
   return $form;
+}
+
+function ixi_upload_upload_form_submit($form, &$form_state) {
+  $filepath = 'private://ixi_archives/';
+  $file = file_save_upload('fid', array('file_validate_extensions' => array('zip')), $filepath);
+  file_save($file);
+
+  if ($file) {
+    drupal_set_message('File successfully uploaded.');
+  }
+  else {
+   drupal_set_message('File was not uploaded.', 'error');
+  }
 }
 
 /**
