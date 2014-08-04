@@ -47,6 +47,13 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+      if (!class_exists('DOMDocument')) {
+        $requirements['ixi_phpdom'] = array(
+          'title' => $t('PHP Document Object Model'),
+          'description' => $t('You must enable PHP\'s <a href="@url">Document Object Model</a>.', array('@url' => 'http://php.net/manual/en/book.dom.php')),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
       break;
     case 'update': break;
     case 'runtime':
