@@ -26,6 +26,11 @@ function ixi_upload_upload_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => t('New @content_type', array('@content_type' => $node_names[variable_get('ixi_group_content_type')])),
   );
+  $form['group_node']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#maxlength' => 255,
+  );
 
   foreach (variable_get('ixi_group_fields') as $field_name) {
     $items = NULL;
