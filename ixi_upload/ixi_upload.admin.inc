@@ -113,9 +113,38 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
 }
 
 function _ixi_upload_create_group_node($form_state, &$context) {
-  $context['results'][] = 'the new group node id';
+  global $user;
+  $node = new stdClass();
+  $node->type = variable_get('ixi_group_content_type');
+  node_object_prepare($node);
+
+  $node->language = LANGUAGE_NONE;
+  $node->uid = $user->uid;
+
+  $node->status = 0;
+  $node->promote = 0;
+  $node->sticky = 0;
+  $node->comment = 1;
+
+  if (module_exists('pathauto')){
+    $node->path['pathauto'] = true;
+  }
+
+  $node->title = $form_state['values']['title'];
+
+  foreach (variable_get('ixi_group_fields') as $field_name) {
+    $node->$field_name = $form_state['values'][$field_name];
+  }
+
+  if ($node = node_submit($node)) {
+    node_save($node);
+  }
+
+  $context['results'][] = t('New @content_type id: @nid.', array(
+    '@content_type' => $form_state['values']['group_content_type'],
+    '@nid' => $node->nid,
+  ));
   $context['message'] = t('Creating the group node.');
-  sleep(2);
 }
 
 function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
