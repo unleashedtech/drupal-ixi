@@ -136,6 +136,9 @@ function _ixi_upload_create_group_node($form_state, &$context) {
     $node->$field_name = $form_state['values'][$field_name];
   }
 
+  // call new hook to allow altering of node before it's saved
+  drupal_alter('ixi_upload_group_node', $node, $form_state);
+
   if ($node = node_submit($node)) {
     node_save($node);
   }

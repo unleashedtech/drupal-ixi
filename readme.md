@@ -17,3 +17,12 @@ should be created when uploading a new archive of XML files. Typically, this
 is the 'volume' content type.
 
 Note that the fields are generated as if they were in the new content form.
+
+Hooks
+-----
+
+### hook_ixi_upload_group_node_alter
+
+You can call this hook to modify the group node before it is saved to the
+database. $node is passed by reference and the $form_state is also available
+in case you need other data from the form.

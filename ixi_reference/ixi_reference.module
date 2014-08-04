@@ -1,2 +1,8 @@
 <?php
 
+/**
+ * Implements hook_ixi_upload_group_node_alter().
+ */
+function ixi_reference_ixi_upload_group_node_alter(&$node, $form_state) {
+  // $node->title = 'This was altered!';
+}
