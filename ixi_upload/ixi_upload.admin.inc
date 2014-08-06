@@ -158,9 +158,79 @@ function _ixi_upload_create_group_node($form_state, $fid, &$context) {
 }
 
 function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
-  $context['results'][] = $fid;
+  $file = file_load($fid);
+  $zip = new ZipArchive();
+
+  $images = array();
+  if(($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+      $zipped_file = $zip->statIndex($i);
+      if (strlen($zipped_file['name']) < 8 || strcmp(substr($zipped_file['name'], 0, 8), '__MACOSX')) {
+        $pathinfo = pathinfo($zipped_file['name']);
+        if (!strcmp($basename, $pathinfo['basename'])) {
+          if (($fp = $zip->getStream($zipped_file['name'])) !== FALSE) {
+            $xml_raw = '';
+            while (!feof($fp)) {
+              $xml_raw .= fread($fp, 2);
+            }
+            fclose($fp);
+            $xml_checksum = md5($xml_raw);
+            $xml = new DomDocument();
+            $xml->recover = true;
+            $xml->loadXML($xml_raw);
+            $xml_new = $xml->saveXML();
+            if (strcmp($xml_checksum, md5($xml_new))) {
+              $xml_new_checksum = md5($xml_new);
+              $old_path = 'temporary://ixi_xml_old.xml';
+              $new_path = 'temporary://ixi_xml_new.xml';
+              file_unmanaged_save_data($xml_raw, $old_path, FILE_EXISTS_REPLACE);
+              file_unmanaged_save_data($xml_new, $new_path, FILE_EXISTS_REPLACE);
+              $diff_array;
+              exec('diff ' . escapeshellarg(drupal_realpath($old_path)) . ' ' . escapeshellarg(drupal_realpath($new_path)), $diff_array);
+              $diff_string = implode("\n", $diff_array);
+              file_unmanaged_delete($old_path);
+              file_unmanaged_delete($new_path);
+            }
+          }
+          else {
+            drupal_set_message(t('Could not read the contents of the XML file.'), 'error');
+          }
+        }
+        else {
+          $parts = explode('/', $dirname);
+          $folder = $parts[0];
+          $parts = explode('/', $pathinfo['dirname']);
+          if (!strcmp($parts[0], $folder) // must be in the same folder as the XML
+              && count($parts) == 2 // must have folder/images
+              && !strcmp($parts[1], 'images') // must have second part of path be "images"
+              && isset($pathinfo['extension']) // must have a file extension
+              && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
+          ) {
+            $images[] = array($i => $zipped_file['name']);
+          }
+        }
+      }
+    }
+  }
+  else {
+    drupal_set_message(t('Could not open the zip file. (zip error code: %code)', array('%code' => $zip_return)), 'error');
+  }
+
+  $id = db_insert('ixi_xml_queue')
+    ->fields(array(
+      'xid' => $context['results'][0],
+      'xml_path' => $dirname,
+      'xml_filename' => $basename,
+      'xml' => $xml_new,
+      'xml_diff' => $diff_string,
+      'checksum_old' => $xml_checksum,
+      'checksum_new' => $xml_new_checksum,
+      'images' => serialize($images),
+    ))
+    ->execute();
+
+  $context['results'][] = $id;
   $context['message'] = t('Checking XML file %xml_filename.', array('%xml_filename' => $basename));
-  sleep(1);
 }
 
 function _ixi_upload_upload_finished($success, $results, $operations) {
