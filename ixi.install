@@ -71,3 +71,41 @@ function ixi_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_schema().
+ */
+function ixi_schema() {
+  $schema['ixi_archive_uploads'] = array(
+    'description' => 'Tracks uploaded archives and the group nodes they point to.',
+    'fields' => array(
+      'xid' => array(
+        'description' => 'The ixi upload id. This will be used to track individual files.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'fid' => array(
+        'description' => 'The file id of the uploaded archive.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'description' => 'The node id of the group node that was created alongside this upload.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'processed' => array(
+        'description' => 'A boolean tracking whether this archive has been processed or not.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('xid'),
+  );
+  return $schema;
+}
