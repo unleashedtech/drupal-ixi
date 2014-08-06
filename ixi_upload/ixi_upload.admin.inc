@@ -67,10 +67,7 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
   $file = file_save_upload('fid', array('file_validate_extensions' => array('zip')), $filepath);
   file_save($file);
 
-  if ($file) {
-    drupal_set_message('File successfully uploaded.');
-  }
-  else {
+  if (!$file) {
    drupal_set_message('File was not uploaded.', 'error');
   }
 
