@@ -107,5 +107,72 @@ function ixi_schema() {
     ),
     'primary key' => array('xid'),
   );
+
+  $schema['ixi_xml_queue'] = array(
+    'description' => 'Tracks individual xml files that need to be imported.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Internal ID of the XML file.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'xid' => array(
+        'description' => 'The id of the XML upload.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'xml_path' => array(
+        'description' => 'Path of the XML file in the archive.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'xml_filename' => array(
+        'description' => 'Filename of the XML file in the archive.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'xml' => array(
+        'description' => 'Raw XML if the file was corrected.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+      'xml_diff' => array(
+        'description' => 'A diff from the old XML to the new XML if it was corrected.',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'checksum_old' => array(
+        'description' => 'Md5 sum of the original XML.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+      ),
+      'checksum_new' => array(
+        'description' => 'Md5 sum of the corrected XML if it exists.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => FALSE,
+      ),
+      'images' => array(
+        'description' => 'An array of image paths and indexes associated with the XML file.',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'processed' => array(
+        'description' => 'A boolean tracking whether this file has been processed or not.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
   return $schema;
 }
