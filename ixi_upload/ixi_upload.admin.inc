@@ -76,7 +76,7 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
 
   $operations[] = array(
     '_ixi_upload_create_group_node',
-    array($form_state),
+    array($form_state, $file->fid),
   );
 
   $found_files = array();
@@ -112,7 +112,7 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
 
 }
 
-function _ixi_upload_create_group_node($form_state, &$context) {
+function _ixi_upload_create_group_node($form_state, $fid, &$context) {
   global $user;
   $node = new stdClass();
   $node->type = variable_get('ixi_group_content_type');
@@ -141,7 +141,17 @@ function _ixi_upload_create_group_node($form_state, &$context) {
 
   if ($node = node_submit($node)) {
     node_save($node);
+
+    $xid = db_insert('ixi_archive_uploads')
+      ->fields(array(
+        'fid' => $fid,
+        'nid' => $node->nid,
+      ))
+      ->execute();
   }
+
+  // store the new xid to the context array so we can reference it later
+  $context['results'][] = $xid;
 
   $context['results'][] = t('New @content_type id: @nid.', array(
     '@content_type' => $form_state['values']['group_content_type'],
