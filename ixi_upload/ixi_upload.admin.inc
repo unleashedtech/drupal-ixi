@@ -107,6 +107,8 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
 
   batch_set($batch);
 
+  $form_state['redirect'] = 'admin/content/add/xml/process';
+
 }
 
 function _ixi_upload_create_group_node($form_state, $fid, &$context) {
