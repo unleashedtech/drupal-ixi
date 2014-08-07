@@ -144,6 +144,7 @@ function ixi_schema() {
       'xml_diff' => array(
         'description' => 'A diff from the old XML to the new XML if it was corrected.',
         'type' => 'text',
+        'size' => 'big',
         'not null' => FALSE,
       ),
       'checksum_old' => array(
