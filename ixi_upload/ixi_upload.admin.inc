@@ -178,21 +178,20 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
             fclose($fp);
             $xml_checksum = md5($xml_raw);
             $xml = new DomDocument();
-            $xml->recover = true;
+            $xml->recover = TRUE;
             $xml->loadXML($xml_raw);
+            $xml->formatOutput = TRUE;
             $xml_new = $xml->saveXML();
-            if (strcmp($xml_checksum, md5($xml_new))) {
-              $xml_new_checksum = md5($xml_new);
-              $old_path = 'temporary://ixi_xml_old.xml';
-              $new_path = 'temporary://ixi_xml_new.xml';
-              file_unmanaged_save_data($xml_raw, $old_path, FILE_EXISTS_REPLACE);
-              file_unmanaged_save_data($xml_new, $new_path, FILE_EXISTS_REPLACE);
-              $diff_array;
-              exec('diff ' . escapeshellarg(drupal_realpath($old_path)) . ' ' . escapeshellarg(drupal_realpath($new_path)), $diff_array);
-              $diff_string = implode("\n", $diff_array);
-              file_unmanaged_delete($old_path);
-              file_unmanaged_delete($new_path);
-            }
+            $xml_new_checksum = md5($xml_new);
+            $old_path = 'temporary://ixi_xml_old.xml';
+            $new_path = 'temporary://ixi_xml_new.xml';
+            file_unmanaged_save_data($xml_raw, $old_path, FILE_EXISTS_REPLACE);
+            file_unmanaged_save_data($xml_new, $new_path, FILE_EXISTS_REPLACE);
+            $diff_array;
+            exec('diff ' . escapeshellarg(drupal_realpath($old_path)) . ' ' . escapeshellarg(drupal_realpath($new_path)), $diff_array);
+            $xml_diff = implode("\n", $diff_array);
+            file_unmanaged_delete($old_path);
+            file_unmanaged_delete($new_path);
           }
           else {
             drupal_set_message(t('Could not read the contents of the XML file.'), 'error');
@@ -224,7 +223,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
       'xml_path' => $dirname,
       'xml_filename' => $basename,
       'xml' => $xml_new,
-      'xml_diff' => $diff_string,
+      'xml_diff' => $xml_diff,
       'checksum_old' => $xml_checksum,
       'checksum_new' => $xml_new_checksum,
       'images' => serialize($images),
