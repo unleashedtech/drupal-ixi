@@ -192,6 +192,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
             $xml_diff = implode("\n", $diff_array);
             file_unmanaged_delete($old_path);
             file_unmanaged_delete($new_path);
+            libxml_use_internal_errors(TRUE);
             if (simplexml_load_string($xml_new) === FALSE) {
               $xml_status = 0;
             }
@@ -339,6 +340,7 @@ function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
 }
 
 function _ixi_upload_edit_xml_form_submit($form, &$form_state, $id) {
+  libxml_use_internal_errors(TRUE);
   if (simplexml_load_string($form_state['values']['xml']) === FALSE) {
     $xml_status = 0;
   }
