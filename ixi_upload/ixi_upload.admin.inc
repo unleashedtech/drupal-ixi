@@ -300,3 +300,58 @@ function ixi_upload_process_form($form, &$form_state) {
 
   return $form;
 }
+
+function _ixi_upload_view_diff($id) {
+  $sql = "SELECT ixq.xml_diff FROM {ixi_xml_queue} ixq WHERE id = :id LIMIT 1";
+  $result = db_query($sql, array(':id' => $id));
+  $build['breadcrumb'] = array(
+    '#markup' => '<p>' . t('Return to <a href="@link">XML Process</a>.', array('@link' => url('admin/content/add/xml/process'))) . '</p>',
+  );
+  if ($result) {
+    $row = $result->fetchAssoc();
+    $build['diff'] = array(
+      '#markup' => '<pre>' . check_plain($row['xml_diff']) . '</pre>',
+    );
+  }
+  drupal_set_title(t('View XML diff'));
+  return $build;
+}
+
+function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
+  $sql = "SELECT ixq.xml FROM {ixi_xml_queue} ixq WHERE id = :id LIMIT 1";
+  $result = db_query($sql, array(':id' => $id));
+  if ($result) {
+    $row = $result->fetchAssoc();
+    $form['xml'] = array(
+      '#type' => 'textarea',
+      '#default_value' => $row['xml'],
+    );
+    $form['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $id,
+    );
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Update XML',
+  );
+  return $form;
+}
+
+function _ixi_upload_edit_xml_form_submit($form, &$form_state, $id) {
+  if (simplexml_load_string($form_state['values']['xml']) === FALSE) {
+    $xml_status = 0;
+  }
+  else {
+    $xml_status = 1;
+  }
+  db_update('ixi_xml_queue')
+    ->fields(array(
+      'xml' => $form_state['values']['xml'],
+      'status' => $xml_status,
+    ))
+    ->condition('id', $form_state['values']['id'], '=')
+    ->execute();
+
+  $form_state['redirect'] = 'admin/content/add/xml/process';
+}
