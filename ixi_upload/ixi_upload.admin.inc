@@ -264,5 +264,39 @@ function _ixi_upload_upload_finished($success, $results, $operations) {
  */
 function ixi_upload_process_form($form, &$form_state) {
   $form = array();
+  $sql = "SELECT ixq.id, ixq.xid, ixq.status, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.processed = '0' ORDER BY iau.xid DESC";
+  $result = db_query($sql);
+  $options = array();
+  $exclude = array();
+  if ($result) {
+    while ($row = $result->fetchAssoc()) {
+      $node = node_load($row['nid']);
+      $options[$row['id']] = array(
+        'xid' => $row['xid'],
+        'nid' => l($node->title, 'node/' . $node->nid),
+        'diff' => l(t('View XML diff'), 'admin/content/add/xml/process/diff/' . $row['id']),
+        'xml' => l(t('Edit XML'), 'admin/content/add/xml/process/edit/' . $row['id']),
+        'processed' => ($row['status']) ? t('Ready') : t('Bad XML'),
+      );
+    }
+    $header = array(
+      'xid' => t('Xid'),
+      'nid' => t('Group Node'),
+      'diff' => t('XML diff'),
+      'xml' => t('Edit XML'),
+      'processed' => t('Status'),
+    );
+    $form['process'] = array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#empty' => t('No files to process.'),
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Process selected files'),
+    );
+  }
+
   return $form;
 }
