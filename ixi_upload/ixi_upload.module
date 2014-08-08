@@ -36,6 +36,40 @@ function ixi_upload_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'ixi_upload.admin.inc',
   );
+  $items['admin/content/add/xml/process/diff/%_ixi_upload_diff'] = array(
+    'title' => 'View XML diff',
+    'page callback' => '_ixi_upload_view_diff',
+    'page arguments' => array(6),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'ixi_upload.admin.inc',
+  );
+  $items['admin/content/add/xml/process/edit/%_ixi_upload_xml_edit'] = array(
+    'title' => 'Edit XML',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_ixi_upload_edit_xml_form', 6),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'ixi_upload.admin.inc',
+  );
 
   return $items;
+}
+
+function _ixi_upload_diff_to_arg($arg) {
+  if ($arg == '%') {
+    return 'none';
+  }
+  else {
+    return $arg;
+  }
+}
+
+function _ixi_upload_xml_edit_to_arg($arg) {
+  if ($arg == '%') {
+    return 'none';
+  }
+  else {
+    return $arg;
+  }
 }
