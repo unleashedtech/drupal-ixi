@@ -339,7 +339,7 @@ function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
   return $form;
 }
 
-function _ixi_upload_edit_xml_form_submit($form, &$form_state, $id) {
+function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
   libxml_use_internal_errors(TRUE);
   if (simplexml_load_string($form_state['values']['xml']) === FALSE) {
     $xml_status = 0;
