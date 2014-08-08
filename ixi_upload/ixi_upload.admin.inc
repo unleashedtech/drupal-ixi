@@ -192,6 +192,12 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
             $xml_diff = implode("\n", $diff_array);
             file_unmanaged_delete($old_path);
             file_unmanaged_delete($new_path);
+            if (simplexml_load_string($xml_new) === FALSE) {
+              $xml_status = 0;
+            }
+            else {
+              $xml_status = 1;
+            }
           }
           else {
             drupal_set_message(t('Could not read the contents of the XML file.'), 'error');
@@ -227,6 +233,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
       'checksum_old' => $xml_checksum,
       'checksum_new' => $xml_new_checksum,
       'images' => serialize($images),
+      'status' => $xml_status,
     ))
     ->execute();
 
