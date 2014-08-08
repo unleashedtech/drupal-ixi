@@ -265,7 +265,7 @@ function _ixi_upload_upload_finished($success, $results, $operations) {
  */
 function ixi_upload_process_form($form, &$form_state) {
   $form = array();
-  $sql = "SELECT ixq.id, ixq.xid, ixq.status, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.processed = '0' ORDER BY iau.xid DESC";
+  $sql = "SELECT ixq.id, ixq.xid, ixq.status, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.processed = '0' ORDER BY iau.xid DESC, ixq.id ASC";
   $result = db_query($sql);
   $options = array();
   $exclude = array();
