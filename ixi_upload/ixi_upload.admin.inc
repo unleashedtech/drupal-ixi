@@ -302,6 +302,28 @@ function ixi_upload_process_form($form, &$form_state) {
   return $form;
 }
 
+function ixi_upload_process_form_submit($form, &$form_state) {
+  $operations = array();
+  foreach ($form_state['values']['process'] as $queue_id) {
+    if ($queue_id != 0) {
+      $operations[] = array(
+        '_ixi_upload_process_queue',
+        array($queue_id),
+      );
+    }
+  }
+  if (count($operations)) {
+    $batch = array(
+      'title' => t('Processing XML Queue...'),
+      'operations' => $operations,
+      'finished' => '_ixi_upload_queue_finished',
+      'file' => drupal_get_path('module', 'ixi_upload') . '/ixi_upload.admin.inc',
+    );
+    batch_set($batch);
+  }
+  $form_state['redirect'] = 'admin/content/add/xml/process';
+}
+
 function _ixi_upload_view_diff($id) {
   $sql = "SELECT ixq.xml_diff FROM {ixi_xml_queue} ixq WHERE id = :id LIMIT 1";
   $result = db_query($sql, array(':id' => $id));
@@ -356,4 +378,27 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
     ->execute();
 
   $form_state['redirect'] = 'admin/content/add/xml/process';
+}
+
+function _ixi_upload_process_queue($id, &$context) {
+  $context['results'][] = $id;
+  $context['message'] = t('Processing xml queue with id: @id.', array('@id' => $id));
+  sleep(2);
+}
+
+function _ixi_upload_queue_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(t('@count files processed.', array('@count' => count($results))));
+  }
+  else {
+    $error_operation = reset($operations);
+    drupal_set_message(
+      t('An error occurred while processing @operation with arguments: @args',
+        array(
+          '@operation' => $error_operation[0],
+          '@args' => print_r($error_operation[0], TRUE),
+        )
+      )
+    );
+  }
 }
