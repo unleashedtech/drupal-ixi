@@ -18,6 +18,8 @@ is the 'volume' content type.
 
 Note that the fields are generated as if they were in the new content form.
 
+For now the module just dumps all images into the public files directory.
+
 Hooks
 -----
 

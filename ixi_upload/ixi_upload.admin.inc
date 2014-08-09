@@ -381,9 +381,34 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
 }
 
 function _ixi_upload_process_queue($id, &$context) {
-  $context['results'][] = $id;
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
+  $result = db_query($sql, array(':id' => $id));
+  if ($result) {
+    $row = $result->fetchAssoc();
+    if ($row['status']) {
+      $file = file_load($row['fid']);
+      $zip = new ZipArchive();
+      if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+        $images = unserialize($row['images']);
+        $saved_images = array();
+        foreach ($images as $index => $image) {
+          $image = array_pop($image);
+          if (($fp = $zip->getStream($image)) !== FALSE) {
+            $raw_data = '';
+            while (!feof($fp)) {
+              $raw_data .= fread($fp, 2);
+            }
+            fclose($fp);
+            $saved_images[$image] = file_unmanaged_save_data($raw_data, 'public://' . basename($image), FILE_EXISTS_RENAME);
+          }
+        }
+      }
+      else {
+        drupal_set_message(t('Could not open zip (zip error code: @code)', array('@code' => $zip_return)), 'error');
+      }
+    }
+  }
   $context['message'] = t('Processing xml queue with id: @id.', array('@id' => $id));
-  sleep(2);
 }
 
 function _ixi_upload_queue_finished($success, $results, $operations) {
