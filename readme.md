@@ -28,3 +28,12 @@ Hooks
 You can call this hook to modify the group node before it is saved to the
 database. $node is passed by reference and the $form_state is also available
 in case you need other data from the form.
+
+### hook_ixi_upload_parse_xml_file
+
+You must implement this hook or no new nodes will be created when processing
+the files. The hook takes an SimpleXML object of the XML, an array of the
+images keyed by original name with paths on the server as their values and the
+node id of the group node that was created during the upload. The hook should
+return the id of the new node that was created or `FALSE` if there was an
+error and no new node was created.

@@ -17,3 +17,19 @@
  */
 function hook_ixi_upload_group_node_alter(&$node, $form_state) {
 }
+
+/**
+ * Create new node based on xml
+ *
+ * @param $xml
+ *   A SimpleXml object representing the xml.
+ *
+ * @param $images
+ *   An array keyed by original filename in the archive with values of the file
+ *   in the drupal filesystem.
+ *
+ * @param $group_nid
+ *   The node id of the group node attached to the upload.
+ */
+function hook_ixi_upload_parse_xml_file($xml, $images, $group_nid) {
+}
