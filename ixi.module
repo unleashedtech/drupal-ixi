@@ -2,10 +2,10 @@
 
 /**
  * @file
- * InDesign XML Importer file
+ * IXI: XML Importer file
  *
- * This modules allows for the upload of XML exported from InDesign to create
- * new content nodes.
+ * This modules allows for the upload of XML exported to create new content
+ * nodes.
  */
 
 /**
@@ -16,7 +16,7 @@ function ixi_help($path, $arg) {
     case 'admin/help#ixi':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Import XML from InDesign as new content nodes.') . '</p>';
+      $output .= '<p>' . t('Import XML as new content nodes.') . '</p>';
       $output .= '<h3>' . t('Configuration') . '</h3>';
       $output .= '<p>' . t('You select a group content type and fields and these fields are added into the upload form when uploading a new archive.') . '</p>';
       $output .= '<p>' . t('Note that the fields that you select are generated as if they were in the add new content form.') . '</p>';
@@ -48,7 +48,7 @@ function ixi_permission() {
 function ixi_menu() {
   $items['admin/config/ixi'] = array(
     'title' => 'XML Import',
-    'description' => 'Configure the InDesign XML Importer.',
+    'description' => 'Configure the XML Importer.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ixi_config_form'),
     'access arguments' => array('administer xml import'),

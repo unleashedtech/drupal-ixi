@@ -2,9 +2,9 @@
 
 /**
  * @file
- * InDesign XML Importer file
+ * IXI: XML Importer file
  *
- * Administration page callbacks for InDesign XML Importer.
+ * Administration page callbacks for IXI: XML Importer.
  */
 
 /**

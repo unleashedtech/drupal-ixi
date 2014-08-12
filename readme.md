@@ -1,5 +1,5 @@
-Drupal InDesign XML Importer
-============================
+IXI: XML Importer
+=================
 
 Installation
 ------------

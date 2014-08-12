@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks prvided by InDesign XML Importer Uploader
+ * Hooks prvided by IXI: XML Importer Uploader
  */
 
 /**

@@ -1,8 +1,7 @@
-;Unleashed Technologies InDesign XML Importer (Reference Implementation)
-name = InDesign XML Importer Reference Implementation
+name = IXI: XML Importer Reference Implementation
 description = Provides a reference implementation for handling different XML.
 core = 7.x
-package = InDesign XML Importer
+package = IXI: XML Importer
 
 dependencies[] = ixi
 dependencies[] = ixi_upload
