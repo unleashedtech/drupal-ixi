@@ -26,6 +26,12 @@ function ixi_config_form($form, &$form_state) {
     '#default_value' => variable_get('ixi_group_fields'),
     '#multiple' => TRUE,
   );
+  $form['ixi_garbage_collect'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Garbage Collect'),
+    '#description' => t('If checked we\'ll delete old uploaded archives and clean old tracking records from the database.'),
+    '#default_value' => variable_get('ixi_garbage_collect'),
+  );
   return system_settings_form($form);
 }
 
