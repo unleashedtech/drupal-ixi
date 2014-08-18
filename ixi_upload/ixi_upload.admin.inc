@@ -316,6 +316,7 @@ function ixi_upload_process_form_submit($form, &$form_state) {
     }
   }
   if (count($operations)) {
+    $operations[] = array('_ixi_upload_cleanup_queue', array());
     $batch = array(
       'title' => t('Processing XML Queue...'),
       'operations' => $operations,
@@ -461,4 +462,26 @@ function _ixi_upload_preview_fields($id) {
     ));
     return array('#markup' => $table);
   }
+}
+
+function _ixi_upload_cleanup_queue(&$context) {
+  $sql = "SELECT iau.xid FROM {ixi_archive_uploads} iau";
+  $result = db_query($sql);
+  $cleaned = 0;
+  if ($result) {
+    foreach ($result as $row) {
+      $r = db_query("SELECT ixq.id FROM {ixi_xml_queue} ixq WHERE ixq.xid = :xid AND ixq.processed = '0'", array(':xid' => $row->xid));
+      if ($r->rowCount() == 0) {
+        db_update('ixi_archive_uploads')
+          ->fields(array(
+            'processed' => 1,
+          ))
+          ->condition('xid', $row->xid)
+          ->execute();
+        $cleaned++;
+      }
+    }
+  }
+  $context['results'][] = $cleaned;
+  $context['message'] = t('Cleaning up...');
 }

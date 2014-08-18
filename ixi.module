@@ -70,16 +70,21 @@ function ixi_menu() {
  * Implements hook_cron().
  */
 function ixi_cron() {
-  $sql = "SELECT iau.xid, iau.fid FROM {ixi_archive_uploads} iau WHERE iau.processed = '1'";
-  $result = db_query($sql);
-  if ($result) {
-    while ($row = $result->fetchAssoc()) {
-      $file = file_load($row['fid']);
-      file_delete($file);
-      db_delete('ixi_archive_uploads')
-        ->condition('xid', $row['xid'])
-        ->execute();
-      watchdog('ixi', 'Deleted file with fid: %fid and associated record: %xid.', array('%fid' => $row['fid'], '%xid' => $row['xid']), WATCHDOG_DEBUG);
+  if (variable_get('ixi_garbage_collect') == 1) {
+    $sql = "SELECT iau.xid, iau.fid FROM {ixi_archive_uploads} iau WHERE iau.processed = '1'";
+    $result = db_query($sql);
+    if ($result) {
+      while ($row = $result->fetchAssoc()) {
+        $file = file_load($row['fid']);
+        file_delete($file);
+        db_delete('ixi_archive_uploads')
+          ->condition('xid', $row['xid'])
+          ->execute();
+        db_delete('ixi_xml_queue')
+          ->condition('xid', $row['xid'])
+          ->execute();
+        watchdog('ixi', 'Deleted file with fid: %fid and associated records: %xid.', array('%fid' => $row['fid'], '%xid' => $row['xid']), WATCHDOG_DEBUG);
+      }
     }
   }
 }
