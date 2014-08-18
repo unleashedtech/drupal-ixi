@@ -406,6 +406,12 @@ function _ixi_upload_process_queue($id, &$context) {
         }
         $xml = simplexml_load_string($row['xml']);
         $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid']);
+        db_update('ixi_xml_queue')
+          ->fields(array(
+            'processed' => 1,
+          ))
+          ->condition('id', $row['id'])
+          ->execute();
       }
       else {
         drupal_set_message(t('Could not open zip (zip error code: @code)', array('@code' => $zip_return)), 'error');
