@@ -138,13 +138,13 @@ function ixi_schema() {
         'not null' => TRUE,
       ),
       'xml' => array(
-        'description' => 'Raw XML if the file was corrected.',
+        'description' => 'Pretty raw XML.',
         'type' => 'text',
         'size' => 'big',
         'not null' => FALSE,
       ),
       'xml_diff' => array(
-        'description' => 'A diff from the old XML to the new XML if it was corrected.',
+        'description' => 'A diff from the old XML to the new XML.',
         'type' => 'text',
         'size' => 'big',
         'not null' => FALSE,
@@ -156,7 +156,7 @@ function ixi_schema() {
         'not null' => TRUE,
       ),
       'checksum_new' => array(
-        'description' => 'Md5 sum of the corrected XML if it exists.',
+        'description' => 'Md5 sum of the corrected XML.',
         'type' => 'varchar',
         'length' => '32',
         'not null' => FALSE,
