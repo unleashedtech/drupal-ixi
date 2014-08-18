@@ -65,6 +65,7 @@ function ixi_upload_upload_form($form, &$form_state) {
 function ixi_upload_upload_form_submit($form, &$form_state) {
   $filepath = 'private://ixi_archives/';
   $file = file_save_upload('fid', array('file_validate_extensions' => array('zip')), $filepath);
+  $file->status = FILE_STATUS_PERMANENT;
   file_save($file);
 
   if (!$file) {
