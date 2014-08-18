@@ -245,8 +245,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
 
 function _ixi_upload_upload_finished($success, $results, $operations) {
   if ($success) {
-    drupal_set_message(t('@count results processed.', array('@count' => count($results))));
-    drupal_set_message(t('The final result was "%final"', array('%final' => end($results))));
+    drupal_set_message(t('@count files processed.', array('@count' => count($results) - 2)));
   }
   else {
     $error_operation = reset($operations);
