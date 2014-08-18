@@ -33,3 +33,12 @@ function hook_ixi_upload_group_node_alter(&$node, $form_state) {
  */
 function hook_ixi_upload_parse_xml_file($xml, $images, $group_nid) {
 }
+
+/**
+ * Return rows of a preview fields table with the field name and its value
+ *
+ * @param $xml
+ *   A SimpleXml object representing the the xml.
+ */
+function hook_ixi_upload_preview_fields($xml) {
+}

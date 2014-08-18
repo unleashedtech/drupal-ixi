@@ -277,7 +277,8 @@ function ixi_upload_process_form($form, &$form_state) {
         'nid' => l($node->title, 'node/' . $node->nid),
         'diff' => l(t('View XML diff'), 'admin/content/add/xml/process/diff/' . $row['id']),
         'xml' => l(t('Edit XML'), 'admin/content/add/xml/process/edit/' . $row['id']),
-        'processed' => ($row['status']) ? t('Ready') : t('Bad XML'),
+        'preview' => l(t('Preview'), 'admin/content/add/xml/process/preview/' . $row['id']),
+        'status' => ($row['status']) ? t('Ready') : t('Bad XML'),
       );
     }
     $header = array(
@@ -285,7 +286,8 @@ function ixi_upload_process_form($form, &$form_state) {
       'nid' => t('Group Node'),
       'diff' => t('XML diff'),
       'xml' => t('Edit XML'),
-      'processed' => t('Status'),
+      'preview' => t('Preview Fields'),
+      'status' => t('Status'),
     );
     $form['process'] = array(
       '#type' => 'tableselect',
@@ -427,5 +429,29 @@ function _ixi_upload_queue_finished($success, $results, $operations) {
         )
       )
     );
+  }
+}
+
+function _ixi_upload_preview_fields($id) {
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
+  $result = db_query($sql, array(':id' => $id));
+  if ($result) {
+    $row = $result->fetchAssoc();
+    $xml = simplexml_load_string($row['xml']);
+    $header = array(
+      t('Field'),
+      t('Value'),
+    );
+    $rows = module_invoke_all('ixi_upload_preview_fields', $xml);
+    $table = theme_table(array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array(),
+      'caption' => NULL,
+      'colgroups' => array(),
+      'sticky' => TRUE,
+      'empty' => t('No fields')
+    ));
+    return array('#markup' => $table);
   }
 }

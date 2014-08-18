@@ -52,6 +52,14 @@ function ixi_upload_menu() {
     'type' => MENU_LOCAL_ACTION,
     'file' => 'ixi_upload.admin.inc',
   );
+  $items['admin/content/add/xml/process/preview/%_ixi_upload_preview'] = array(
+    'title' => 'Preview Fields',
+    'page callback' => '_ixi_upload_preview_fields',
+    'page arguments' => array(6),
+    'access arguments' => array('perform xml import'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'ixi_upload.admin.inc',
+  );
 
   return $items;
 }
@@ -66,6 +74,15 @@ function _ixi_upload_diff_to_arg($arg) {
 }
 
 function _ixi_upload_xml_edit_to_arg($arg) {
+  if ($arg == '%') {
+    return 'none';
+  }
+  else {
+    return $arg;
+  }
+}
+
+function _ixi_upload_preview_to_arg($arg) {
   if ($arg == '%') {
     return 'none';
   }
