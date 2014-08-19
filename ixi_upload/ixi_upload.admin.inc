@@ -417,7 +417,7 @@ function _ixi_upload_process_queue($id, &$context) {
           ->fields(array(
             'processed' => 1,
           ))
-          ->condition('id', $row['id'])
+          ->condition('id', $row['id'], '=')
           ->execute();
       }
       else {
@@ -518,7 +518,7 @@ function _ixi_upload_cleanup_queue(&$context) {
           ->fields(array(
             'processed' => 1,
           ))
-          ->condition('xid', $row->xid)
+          ->condition('xid', $row->xid, '=')
           ->execute();
         $cleaned++;
       }

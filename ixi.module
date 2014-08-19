@@ -79,16 +79,16 @@ function ixi_cron() {
         $o_result = db_query($o_sql, array(':xid' => $row['xid']));
         foreach ($o_result as $o_row) {
           db_delete('ixi_overrides')
-            ->condition('id', $o_row->id)
+            ->condition('id', $o_row->id, '=')
             ->execute();
         }
         $file = file_load($row['fid']);
         file_delete($file);
         db_delete('ixi_archive_uploads')
-          ->condition('xid', $row['xid'])
+          ->condition('xid', $row['xid'], '=')
           ->execute();
         db_delete('ixi_xml_queue')
-          ->condition('xid', $row['xid'])
+          ->condition('xid', $row['xid'], '=')
           ->execute();
         watchdog('ixi', 'Deleted file with fid: %fid and associated records: %xid.', array('%fid' => $row['fid'], '%xid' => $row['xid']), WATCHDOG_DEBUG);
       }
