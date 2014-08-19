@@ -406,7 +406,13 @@ function _ixi_upload_process_queue($id, &$context) {
           }
         }
         $xml = simplexml_load_string($row['xml']);
-        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid']);
+        $o_sql = "SELECT io.field, io.value FROM {ixi_overrides} io WHERE io.id = :id AND io.changed = '1'";
+        $o_result = db_query($o_sql, array(':id' => $row['id']));
+        $overrides = array();
+        foreach ($o_result as $o_row) {
+          $overrides[$o_row->field] = $o_row->value;
+        }
+        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid'], $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
             'processed' => 1,
