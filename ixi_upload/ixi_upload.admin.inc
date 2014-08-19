@@ -484,3 +484,41 @@ function _ixi_upload_cleanup_queue(&$context) {
   $context['results'][] = $cleaned;
   $context['message'] = t('Cleaning up...');
 }
+
+function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
+  $sql = "SELECT io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
+  $result = db_query($sql, array(':oid' => $oid));
+  $form = array();
+  if ($result) {
+    $row = $result->fetchAssoc();
+    $form['value'] = array(
+      '#type' => 'textarea',
+      '#default_value' => $row['value'],
+    );
+    $form['oid'] = array(
+      '#type' => 'hidden',
+      '#value' => $oid,
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => 'Ovverride',
+    );
+  }
+  return $form;
+}
+
+function _ixi_upload_preview_override_form_submit($form, &$form_state) {
+  $sql = "SELECT io.id, io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
+  $result = db_query($sql, array(':oid' => $form_state['values']['oid']));
+  $row = $result->fetchAssoc();
+  if (strcmp($row['value'], $form_state['values']['value'])) {
+    db_update('ixi_overrides')
+      ->fields(array(
+        'value' => $form_state['values']['value'],
+        'changed' => 1,
+      ))
+      ->condition('oid', $form_state['values']['oid'], '=')
+      ->execute();
+  }
+  $form_state['redirect'] = 'admin/content/add/xml/process/preview/' . $row['id'];
+}
