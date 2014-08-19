@@ -465,33 +465,36 @@ function _ixi_upload_preview_fields($id) {
     $fields = module_invoke_all('ixi_upload_preview_fields', $xml, $overrides);
     $rows = array();
     foreach ($fields as $field => $options) {
-      $check = db_query("SELECT io.oid FROM {ixi_overrides} io WHERE io.id = :id AND io.field = :field LIMIT 1", array(
-        ':id' => $id,
-        ':field' => $field,
-      ));
-      if ($check) {
-        if ($check->rowCount() == 0) {
-          $oid = db_insert('ixi_overrides')
-            ->fields(array(
-              'id' => $id,
-              'field' => $field,
-              'value' => $options['value'],
-            ))
-            ->execute();
-        }
-        else {
-          $r = $check->fetchAssoc();
-          $oid = $r['oid'];
-        }
-        $row = array($options['field'], $options['value']);
-        if ($options['override']) {
+      $row = array($options['field'], $options['value']);
+      if ($options['override']) {
+        $check = db_query("SELECT io.oid FROM {ixi_overrides} io WHERE io.id = :id AND io.field = :field LIMIT 1", array(
+          ':id' => $id,
+          ':field' => $field,
+        ));
+        if ($check) {
+          if ($check->rowCount() == 0) {
+            $oid = db_insert('ixi_overrides')
+              ->fields(array(
+                'id' => $id,
+                'field' => $field,
+                'value' => $options['value'],
+              ))
+              ->execute();
+          }
+          else {
+            $r = $check->fetchAssoc();
+            $oid = $r['oid'];
+          }
           $row[] = l(t('Override'), 'admin/content/add/xml/process/preview/override/' . $oid);
         }
         else {
           $row[] = '';
         }
-        $rows[] = $row;
       }
+      else {
+        $row[] = '';
+      }
+      $rows[] = $row;
     }
     $table = theme_table(array(
       'header' => $header,
