@@ -75,6 +75,13 @@ function ixi_cron() {
     $result = db_query($sql);
     if ($result) {
       while ($row = $result->fetchAssoc()) {
+        $o_sql = "SELECT ixq.id FROM {ixi_xml_queue} ixq WHERE ixq.xid = :xid";
+        $o_result = db_query($o_sql, array(':xid' => $row['xid']));
+        foreach ($o_result as $o_row) {
+          db_delete('ixi_overrides')
+            ->condition('id', $o_row->id)
+            ->execute();
+        }
         $file = file_load($row['fid']);
         file_delete($file);
         db_delete('ixi_archive_uploads')
