@@ -18,11 +18,27 @@ function ixi_config_form($form, &$form_state) {
     '#description' => t('What content type should be created when uploading new files?'),
     '#default_value' => variable_get('ixi_group_content_type'),
     '#required' => TRUE,
+    '#ajax' => array(
+      'event' => 'change',
+      'callback' => '_ixi_ajax_group_fields',
+      'wrapper' => 'group-fields-wrapper',
+    ),
   );
-  $form['ixi_group_fields'] = array(
+  $form['wrapper'] = array(
+    '#prefix' => '<div id="group-fields-wrapper">',
+    '#suffix' => '</div>',
+  );
+  $options = array();
+  if (isset($form_state['values']['ixi_group_content_type'])) {
+    $options = _ixi_get_content_type_fields($form_state['values']['ixi_group_content_type']);
+  }
+  elseif (!is_null(variable_get('ixi_group_content_type'))) {
+    $options = _ixi_get_content_type_fields(variable_get('ixi_group_content_type'));
+  }
+  $form['wrapper']['ixi_group_fields'] = array(
     '#type' => 'select',
     '#title' => t('Group fields'),
-    '#options' => _ixi_get_content_type_fields(variable_get('ixi_group_content_type')),
+    '#options' => $options,
     '#default_value' => variable_get('ixi_group_fields'),
     '#multiple' => TRUE,
   );
@@ -54,6 +70,10 @@ function _ixi_get_content_type_fields($content_type) {
     }
     return $fields;
   }
+}
+
+function _ixi_ajax_group_fields($form, &$form_state) {
+  return $form['wrapper'];
 }
 
 function ixi_recreate_archive_directory_form() {
