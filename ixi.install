@@ -110,6 +110,44 @@ function ixi_schema() {
     'primary key' => array('xid'),
   );
 
+  $schema['ixi_overrides'] = array(
+    'description' => 'Field overrides for individual xml files.',
+    'fields' => array(
+      'oid' => array(
+        'description' => 'Override id.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'id' => array(
+        'description' => 'Id from the queue table.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'field' => array(
+        'description' => 'Name of the field as designated by the developer.',
+        'type' => 'varchar',
+        'length' => '100',
+        'not null' => TRUE,
+      ),
+      'value' => array(
+        'description' => 'New, overridden value of the field.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'Whether the value has actually been overridden or not.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('oid'),
+  );
+
   $schema['ixi_xml_queue'] = array(
     'description' => 'Tracks individual xml files that need to be imported.',
     'fields' => array(

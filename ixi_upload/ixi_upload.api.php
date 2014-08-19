@@ -30,6 +30,10 @@ function hook_ixi_upload_group_node_alter(&$node, $form_state) {
  *
  * @param $group_nid
  *   The node id of the group node attached to the upload.
+ *
+ * @param $overrides
+ *   An array of fields as defined by the developer as keys with overridden
+ *   values (only if they have actually been overridden).
  */
 function hook_ixi_upload_parse_xml_file($xml, $images, $group_nid) {
 }

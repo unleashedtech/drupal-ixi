@@ -406,7 +406,13 @@ function _ixi_upload_process_queue($id, &$context) {
           }
         }
         $xml = simplexml_load_string($row['xml']);
-        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid']);
+        $o_sql = "SELECT io.field, io.value FROM {ixi_overrides} io WHERE io.id = :id AND io.changed = '1'";
+        $o_result = db_query($o_sql, array(':id' => $row['id']));
+        $overrides = array();
+        foreach ($o_result as $o_row) {
+          $overrides[$o_row->field] = $o_row->value;
+        }
+        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid'], $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
             'processed' => 1,
@@ -448,8 +454,45 @@ function _ixi_upload_preview_fields($id) {
     $header = array(
       t('Field'),
       t('Value'),
+      t('Override'),
     );
-    $rows = module_invoke_all('ixi_upload_preview_fields', $xml);
+    $o_sql = "SELECT io.field, io.value FROM {ixi_overrides} io WHERE io.id = :id AND io.changed = '1'";
+    $o_result = db_query($o_sql, array(':id' => $row['id']));
+    $overrides = array();
+    foreach ($o_result as $o_row) {
+      $overrides[$o_row->field] = $o_row->value;
+    }
+    $fields = module_invoke_all('ixi_upload_preview_fields', $xml, $overrides);
+    $rows = array();
+    foreach ($fields as $field => $options) {
+      $check = db_query("SELECT io.oid FROM {ixi_overrides} io WHERE io.id = :id AND io.field = :field LIMIT 1", array(
+        ':id' => $id,
+        ':field' => $field,
+      ));
+      if ($check) {
+        if ($check->rowCount() == 0) {
+          $oid = db_insert('ixi_overrides')
+            ->fields(array(
+              'id' => $id,
+              'field' => $field,
+              'value' => $options['value'],
+            ))
+            ->execute();
+        }
+        else {
+          $r = $check->fetchAssoc();
+          $oid = $r['oid'];
+        }
+        $row = array($options['field'], $options['value']);
+        if ($options['override']) {
+          $row[] = l(t('Override'), 'admin/content/add/xml/process/preview/override/' . $oid);
+        }
+        else {
+          $row[] = '';
+        }
+        $rows[] = $row;
+      }
+    }
     $table = theme_table(array(
       'header' => $header,
       'rows' => $rows,
@@ -483,4 +526,42 @@ function _ixi_upload_cleanup_queue(&$context) {
   }
   $context['results'][] = $cleaned;
   $context['message'] = t('Cleaning up...');
+}
+
+function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
+  $sql = "SELECT io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
+  $result = db_query($sql, array(':oid' => $oid));
+  $form = array();
+  if ($result) {
+    $row = $result->fetchAssoc();
+    $form['value'] = array(
+      '#type' => 'textarea',
+      '#default_value' => $row['value'],
+    );
+    $form['oid'] = array(
+      '#type' => 'hidden',
+      '#value' => $oid,
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => 'Ovverride',
+    );
+  }
+  return $form;
+}
+
+function _ixi_upload_preview_override_form_submit($form, &$form_state) {
+  $sql = "SELECT io.id, io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
+  $result = db_query($sql, array(':oid' => $form_state['values']['oid']));
+  $row = $result->fetchAssoc();
+  if (strcmp($row['value'], $form_state['values']['value'])) {
+    db_update('ixi_overrides')
+      ->fields(array(
+        'value' => $form_state['values']['value'],
+        'changed' => 1,
+      ))
+      ->condition('oid', $form_state['values']['oid'], '=')
+      ->execute();
+  }
+  $form_state['redirect'] = 'admin/content/add/xml/process/preview/' . $row['id'];
 }
