@@ -10,7 +10,7 @@
 /**
  * Form constructor for configuring the XML importer.
  */
-function ixi_config_form($form, &$form_state) {
+function _ixi_config_form($form, &$form_state) {
   $form['ixi_group_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Group content type'),
@@ -84,11 +84,11 @@ function _ixi_ajax_group_fields($form, &$form_state) {
   return $form['wrapper'];
 }
 
-function ixi_recreate_archive_directory_form() {
+function _ixi_recreate_archive_directory_form() {
   return confirm_form(array(), t('Do you want to attempt to recreate the archives upload directory?'), 'admin/reports/status', t('This will attempt to recreate and make writable the upload archives directory: <em>%directory</em>.', array('%directory' => 'private://ixi_archives')), t('Recreate archive directory'), t('Cancel'));
 }
 
-function ixi_recreate_archive_directory_form_submit($form, &$form_state) {
+function _ixi_recreate_archive_directory_form_submit($form, &$form_state) {
   _ixi_recreate_archive_directory();
   $form_state['redirect'] = 'admin/reports/status';
 }
