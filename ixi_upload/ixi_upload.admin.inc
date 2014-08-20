@@ -393,7 +393,7 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
 }
 
 function _ixi_upload_process_queue($id, &$context) {
-  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, ixq.files, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
   $result = db_query($sql, array(':id' => $id));
   if ($result) {
     $row = $result->fetchAssoc();
@@ -414,6 +414,7 @@ function _ixi_upload_process_queue($id, &$context) {
             $saved_images[$image] = file_unmanaged_save_data($raw_data, 'public://' . basename($image), FILE_EXISTS_RENAME);
           }
         }
+        $files = unserialize($row['files']);
         $xml = simplexml_load_string($row['xml']);
         $o_sql = "SELECT io.field, io.value FROM {ixi_overrides} io WHERE io.id = :id AND io.changed = '1'";
         $o_result = db_query($o_sql, array(':id' => $row['id']));
@@ -421,7 +422,7 @@ function _ixi_upload_process_queue($id, &$context) {
         foreach ($o_result as $o_row) {
           $overrides[$o_row->field] = $o_row->value;
         }
-        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid'], $overrides);
+        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $files, $row['nid'], $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
             'processed' => 1,
