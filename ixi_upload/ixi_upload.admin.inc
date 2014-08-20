@@ -213,6 +213,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
               && count($parts) == 2 // must have folder/images
               && !strcmp($parts[1], 'images') // must have second part of path be "images"
               && isset($pathinfo['extension']) // must have a file extension
+              && in_array($pathinfo['extension'], variable_get('ixi_image_extensions')) // must be valid image extension
               && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
           ) {
             $images[] = array($i => $zipped_file['name']);

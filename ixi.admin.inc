@@ -42,6 +42,14 @@ function ixi_config_form($form, &$form_state) {
     '#default_value' => variable_get('ixi_group_fields'),
     '#multiple' => TRUE,
   );
+  $form['ixi_image_extensions'] = array(
+    '#type' => 'select',
+    '#title' => t('Image Extesions'),
+    '#description' => t('Image extensions to automatically process and extract to public folder.'),
+    '#options' => array('bmp' => 'bmp', 'gif' => 'gif', 'jpg' => 'jpg', 'jpeg' => 'jpeg', 'png' => 'png'),
+    '#default_value' => variable_get('ixi_image_extensions'),
+    '#multiple' => TRUE,
+  );
   $form['ixi_garbage_collect'] = array(
     '#type' => 'checkbox',
     '#title' => t('Garbage Collect'),
