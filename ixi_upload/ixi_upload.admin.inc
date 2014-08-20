@@ -164,6 +164,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
   $file = file_load($fid);
   $zip = new ZipArchive();
 
+  $files = array();
   $images = array();
   if(($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -218,6 +219,12 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           ) {
             $images[] = array($i => $zipped_file['name']);
           }
+          elseif (!strcmp($parts[0], $folder) // must be in the same folder as the XML
+                  && isset($pathinfo['extension']) // must have a file extension
+                  && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
+          ) {
+            $files[$i] = $zipped_file['name'];
+          }
         }
       }
     }
@@ -236,6 +243,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
       'checksum_old' => $xml_checksum,
       'checksum_new' => $xml_new_checksum,
       'images' => serialize($images),
+      'files' => serialize($files),
       'status' => $xml_status,
     ))
     ->execute();
