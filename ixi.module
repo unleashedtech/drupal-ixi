@@ -112,7 +112,12 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
         fclose($fp);
         $pathinfo = pathinfo($filename);
         if ($preserve_folder_structure) {
-          $destination .= $pathinfo['dirname'];
+          if (substr($destination, -1) != '/') {
+            $destination .= '/' . $pathinfo['dirname'];
+          }
+          else {
+            $destination .= $pathinfo['dirname'];
+          }
         }
         if (file_prepare_directory($destination, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
           if (substr($destination, -1) != '/') {
