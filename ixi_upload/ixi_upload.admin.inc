@@ -422,7 +422,8 @@ function _ixi_upload_process_queue($id, &$context) {
         foreach ($o_result as $o_row) {
           $overrides[$o_row->field] = $o_row->value;
         }
-        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $files, $row['nid'], $overrides);
+        $ids = array('id' => $row['id'], 'xid' => $row['xid'], 'group_nid' => $row['nid']);
+        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $files, $ids, $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
             'processed' => 1,

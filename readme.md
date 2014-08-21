@@ -33,11 +33,14 @@ in case you need other data from the form.
 
 You must implement this hook or no new nodes will be created when processing
 the files. The hook takes an SimpleXML object of the XML, an array of the
-images keyed by original name with paths on the server as their values and the
-node id of the group node that was created during the upload. The overrides
-array contains an array of field names and the overridden value. The hook
-should return the id of the new node that was created or `FALSE` if there was
-an error and no new node was created.
+images keyed by original name with paths on the server as their values, an
+array of additional files in the same folder as the XML file (these can be
+retrieved by using `ixi_extract_to` and `ixi_extract_data` and an array of
+useful ids: the id of the queue, the upload id and the node id of the group
+node that was created during the upload. The overrides array contains an array
+of field names and the overridden value. The hook should return the id of the
+new node that was created or `FALSE` if there was an error and no new node was
+created.
 
 ### hook_ixi_upload_preview_fields
 

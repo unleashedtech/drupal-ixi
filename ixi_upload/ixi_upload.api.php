@@ -33,14 +33,16 @@ function hook_ixi_upload_group_node_alter(&$node, $form_state) {
  *   be retrived by calling ixi_extract_to to extract the file to the public
  *   folder or ixi_extract_data to get a raw stream of the uncompressed file.
  *
- * @param $group_nid
- *   The node id of the group node attached to the upload.
+ * @param $ids
+ *   An array with useful ids: 'id' is the xml queue id, 'xid' is the upload id
+ *   and 'group_nid' is the node id of the group node that was created when
+ *   the archive was uploaded.
  *
  * @param $overrides
  *   An array of fields as defined by the developer as keys with overridden
  *   values (only if they have actually been overridden).
  */
-function hook_ixi_upload_parse_xml_file($xml, $images, $files, $group_nid, $overrides) {
+function hook_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides) {
 }
 
 /**
