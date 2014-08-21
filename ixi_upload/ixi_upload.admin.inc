@@ -184,6 +184,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
             $xml->loadXML($xml_raw);
             $xml->formatOutput = TRUE;
             $xml_new = $xml->saveXML();
+            drupal_alter('ixi_upload_xml', $xml_new);
             $xml_new_checksum = md5($xml_new);
             $old_path = 'temporary://ixi_xml_old.xml';
             $new_path = 'temporary://ixi_xml_new.xml';
@@ -307,13 +308,19 @@ function ixi_upload_process_form($form, &$form_state) {
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Process selected files'),
+      '#submit' => array('ixi_upload_process_form_submit_process'),
+    );
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete records'),
+      '#submit' => array('ixi_upload_process_form_submit_delete'),
     );
   }
 
   return $form;
 }
 
-function ixi_upload_process_form_submit($form, &$form_state) {
+function ixi_upload_process_form_submit_process($form, &$form_state) {
   $operations = array();
   foreach ($form_state['values']['process'] as $queue_id) {
     if ($queue_id != 0) {
@@ -334,6 +341,17 @@ function ixi_upload_process_form_submit($form, &$form_state) {
     batch_set($batch);
   }
   $form_state['redirect'] = 'admin/content/add/xml/process';
+}
+
+function ixi_upload_process_form_submit_delete($form, &$form_state) {
+  db_delete('ixi_xml_queue')
+    ->condition('id', $form_state['values']['process'], 'IN')
+    ->execute();
+  db_delete('ixi_overrides')
+    ->condition('id', $form_state['values']['process'], 'IN')
+    ->execute();
+  $context = array(); // set a dummy context variable so we can reuse the batch cleanup
+  _ixi_upload_cleanup_queue($context);
 }
 
 function _ixi_upload_view_diff($id) {
