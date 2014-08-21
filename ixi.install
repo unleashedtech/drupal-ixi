@@ -206,6 +206,11 @@ function ixi_schema() {
         'type' => 'text',
         'not null' => FALSE,
       ),
+      'files' => array(
+        'description' => 'An array of files and indexes associated with the XML file.',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
       'processed' => array(
         'description' => 'A boolean tracking whether this file has been processed or not.',
         'type' => 'int',

@@ -164,6 +164,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
   $file = file_load($fid);
   $zip = new ZipArchive();
 
+  $files = array();
   $images = array();
   if(($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -218,6 +219,12 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           ) {
             $images[] = array($i => $zipped_file['name']);
           }
+          elseif (!strcmp($parts[0], $folder) // must be in the same folder as the XML
+                  && isset($pathinfo['extension']) // must have a file extension
+                  && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
+          ) {
+            $files[$i] = $zipped_file['name'];
+          }
         }
       }
     }
@@ -236,6 +243,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
       'checksum_old' => $xml_checksum,
       'checksum_new' => $xml_new_checksum,
       'images' => serialize($images),
+      'files' => serialize($files),
       'status' => $xml_status,
     ))
     ->execute();
@@ -385,7 +393,7 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
 }
 
 function _ixi_upload_process_queue($id, &$context) {
-  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, ixq.files, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
   $result = db_query($sql, array(':id' => $id));
   if ($result) {
     $row = $result->fetchAssoc();
@@ -406,6 +414,7 @@ function _ixi_upload_process_queue($id, &$context) {
             $saved_images[$image] = file_unmanaged_save_data($raw_data, 'public://' . basename($image), FILE_EXISTS_RENAME);
           }
         }
+        $files = unserialize($row['files']);
         $xml = simplexml_load_string($row['xml']);
         $o_sql = "SELECT io.field, io.value FROM {ixi_overrides} io WHERE io.id = :id AND io.changed = '1'";
         $o_result = db_query($o_sql, array(':id' => $row['id']));
@@ -413,7 +422,8 @@ function _ixi_upload_process_queue($id, &$context) {
         foreach ($o_result as $o_row) {
           $overrides[$o_row->field] = $o_row->value;
         }
-        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $row['nid'], $overrides);
+        $ids = array('id' => $row['id'], 'xid' => $row['xid'], 'group_nid' => $row['nid']);
+        $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $files, $ids, $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
             'processed' => 1,
