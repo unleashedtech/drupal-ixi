@@ -95,3 +95,75 @@ function ixi_cron() {
     }
   }
 }
+
+function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_folder_structure = FALSE) {
+  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid LIMIT 1";
+  $result = db_query($sql, array(':xid' => $xid));
+  if ($result && $result->rowCount()) {
+    $row = $result->fetchAssoc();
+    $file = file_load($row['fid']);
+    $zip = new ZipArchive();
+    if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+      if (($fp = $zip->getStream($filename)) !== FALSE) {
+        $data = '';
+        while (!feof($fp)) {
+          $data .= fread($fp, 2);
+        }
+        fclose($fp);
+        $pathinfo = pathinfo($filename);
+        if ($preserve_folder_structure) {
+          $destination .= $pathinfo['dirname'];
+        }
+        if (file_prepare_directory($destination, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+          if (substr($destination, -1) != '/') {
+            $destination .= '/';
+          }
+          return file_unmanaged_save_data($data, $destination . basename($filename), FILE_EXISTS_RENAME);
+        }
+        else {
+          return FALSE;
+        }
+      }
+      else {
+        return FALSE;
+      }
+    }
+    else {
+      drupal_set_message(t('Could not open the zip file. (zip error code: %code)', array('%code' => $zip_return)), 'error');
+      return FALSE;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
+
+function ixi_extract_data($xid, $filename) {
+  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid LIMIT 1";
+  $result = db_query($sql, array(':xid' => $xid));
+  if ($result && $result->rowCount()) {
+    $row = $result->fetchAssoc();
+    $file = file_load($row['fid']);
+    $zip = new ZipArchive();
+    if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+      if (($fp = $zip->getStream($filename)) !== FALSE) {
+        $data = '';
+        while (!feof($fp)) {
+          $data .= fread($fp, 2);
+        }
+        fclose($fp);
+        return $data;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    else {
+      drupal_set_message(t('Could not open the zip file. (zip error code: %code)', array('%code' => $zip_return)), 'error');
+      return FALSE;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
