@@ -4,5 +4,22 @@
  * Implements hook_ixi_upload_group_node_alter().
  */
 function ixi_reference_ixi_upload_group_node_alter(&$node, $form_state) {
-  // $node->title = 'This was altered!';
+  /* Here we can modify the new node that is being created when we upload a
+   * new archive. For example, let's force uppercase words on the title:
+   */
+  $node->title = ucwords(strtolower($node->title));
+  /* We also have the form_state available should we need to access some
+   * value that was submitted along with the form.
+   */
+}
+
+/**
+ * Implements hook_ixi_upload_xml_alter().
+ */
+function ixi_reference_ixi_upload_xml_alter(&$xml) {
+  /* This function will let us modify the XML before it is saved to the
+   * database. For example, let's say we get bad XML and we want to ensure a
+   * proper UTF-8 character set:
+   */
+  $xml = iconv('UTF-8', 'UTF-8//TRANSLIT', $xml);
 }
