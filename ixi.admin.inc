@@ -50,6 +50,13 @@ function _ixi_config_form($form, &$form_state) {
     '#default_value' => variable_get('ixi_image_extensions'),
     '#multiple' => TRUE,
   );
+  $form['ixi_extra_extensions'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Restrict File Extensions'),
+    '#description' => t('Enter file extensions that you would like to restrict in the extra files array, separated by a \';\'. Or you can leave it blank to get everything.'),
+    '#default_value' => variable_get('ixi_extra_extensions'),
+    '#required' => FALSE,
+  );
   $form['ixi_garbage_collect'] = array(
     '#type' => 'checkbox',
     '#title' => t('Garbage Collect'),

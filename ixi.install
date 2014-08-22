@@ -14,6 +14,7 @@
 function ixi_install() {
   variable_set('ixi_garbage_collect', 1);
   variable_set('ixi_image_extensions', array('bmp', 'gif', 'jpg', 'jpeg', 'png'));
+  variable_set('ixi_extra_extensions', '');
 }
 
 /**
@@ -24,6 +25,7 @@ function ixi_uninstall() {
   variable_del('ixi_group_fields');
   variable_del('ixi_garbage_collect');
   variable_del('ixi_image_extensions');
+  variable_del('ixi_extra_extensions');
 }
 
 /**
