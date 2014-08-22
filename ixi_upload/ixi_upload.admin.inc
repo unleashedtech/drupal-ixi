@@ -211,6 +211,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           $parts = explode('/', $dirname);
           $folder = $parts[0];
           $parts = explode('/', $pathinfo['dirname']);
+          $extra_extensions = (!strlen(variable_get('ixi_extra_extensions'))) ? null : explode(';', variable_get('ixi_extra_extensions'));
           if (!strcmp($parts[0], $folder) // must be in the same folder as the XML
               && count($parts) == 2 // must have folder/images
               && !strcmp($parts[1], 'images') // must have second part of path be "images"
@@ -222,6 +223,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           }
           elseif (!strcmp($parts[0], $folder) // must be in the same folder as the XML
                   && isset($pathinfo['extension']) // must have a file extension
+                  && (!is_array($extra_extensions) || in_array($pathinfo['extension'], $extra_extensions)) // only get allowed extra extensions
                   && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
           ) {
             $files[$i] = $zipped_file['name'];
