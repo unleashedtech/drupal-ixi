@@ -26,6 +26,13 @@ function ixi_uninstall() {
   variable_del('ixi_garbage_collect');
   variable_del('ixi_image_extensions');
   variable_del('ixi_extra_extensions');
+  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau";
+  $result = db_query($sql);
+  foreach ($result as $row) {
+    $file = file_load($row->fid);
+    file_delete($file);
+  }
+  drupal_rmdir('private://ixi_archives');
 }
 
 /**
