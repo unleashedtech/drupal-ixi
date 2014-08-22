@@ -16,11 +16,13 @@ function ixi_help($path, $arg) {
     case 'admin/help#ixi':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Import XML as new content nodes.') . '</p>';
+      $output .= '<p>' . t('IXI allows you to import and archive of XML files into your Drupal site. Each archive is associated with a new "group" node and all other files in the same folder are available, with images being automatically extracted to the public files directory.') . '</p>';
+      $output .= '<p>' . t('<strong>N.B.</strong> Please note that to create new nodes, taxonomy terms or whatever else there are several hooks that <em>must</em> be implemented. A reference implementation is available.') . '</p>';
       $output .= '<h3>' . t('Configuration') . '</h3>';
-      $output .= '<p>' . t('You select a group content type and fields and these fields are added into the upload form when uploading a new archive.') . '</p>';
-      $output .= '<p>' . t('Note that the fields that you select are generated as if they were in the add new content form.') . '</p>';
-      $output .= '<h3>' . t('General Information') . '</h3>';
+      $output .= '<p>' . t('You select a group content type and fields and these fields are added into the upload form when uploading a new archive. Please note that the fields that you select are generated as if they were in the add new content form.') . '</p>';
+      $output .= '<h3>' . t('Implementation') . '</h3>';
+      $output .= '<p>' . t('You must implement both the <code>hook_ixi_upload_parse_xml_file</code> and <code>hook_ixi_upload_preview_fields</code> hooks. Please see the included readme, ixi_upload.api.php and the reference implementation for help and information about how to implement the hooks.') . '</p>';
+      $output .= '<h3>' . t('Other Information') . '</h3>';
       $output .= '<p>' . t('The module saves uploaded archives in the private files folder under &quot;ixi_archives&quot; so that they aren\'t exposed to the public prior to processing.') . '</p>';
       return $output;
   }
