@@ -80,6 +80,15 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+      if (is_null(variable_get('ixi_group_content_type')) || is_null(variable_get('ixi_group_fields'))) {
+        $description = $t('The IXI module has not been configured! Please set group node options.');
+        $requirements['ixi_config'] = array(
+          'title' => 'IXI Configuration',
+          'description' => $description . ' ' . l($t('Configure IXI'), 'admin/config/ixi'),
+          'value' => 'Not configured',
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
       break;
   }
   return $requirements;
