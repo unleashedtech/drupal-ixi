@@ -10,8 +10,8 @@
 /**
  * Form constructor for uploading an archive of XML files.
  *
- * @see http://www.alexweber.com.br/en/articles/how-manually-add-entity-field-forms-custom-drupal-form for
- * information on including field forms in the form.
+ * @see http://www.alexweber.com.br/en/articles/how-manually-add-entity-field-forms-custom-drupal-form
+ *   for information on including field forms in the form.
  */
 function ixi_upload_upload_form($form, &$form_state) {
   $form['#attributes']['enctype'] = 'multipart/form-data';
@@ -69,7 +69,7 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
   file_save($file);
 
   if (!$file) {
-   drupal_set_message('File was not uploaded.', 'error');
+    drupal_set_message(t('File was not uploaded.'), 'error');
   }
 
   $operations[] = array(
@@ -96,7 +96,7 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
     $zip->close();
   }
   else {
-    drupal_set_message('Could not open zip (zip error code: ' . $zip_return . ')', 'error');
+    drupal_set_message(t('Could not open zip (zip error code: @code)', array('@code' => $zip_return)), 'error');
   }
 
   $batch = array(
@@ -126,8 +126,8 @@ function _ixi_upload_create_group_node($form_state, $fid, &$context) {
   $node->sticky = 0;
   $node->comment = 1;
 
-  if (module_exists('pathauto')){
-    $node->path['pathauto'] = true;
+  if (module_exists('pathauto')) {
+    $node->path['pathauto'] = TRUE;
   }
 
   $node->title = $form_state['values']['title'];
@@ -166,7 +166,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
 
   $files = array();
   $images = array();
-  if(($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+  if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
     for ($i = 0; $i < $zip->numFiles; $i++) {
       $zipped_file = $zip->statIndex($i);
       if (strlen($zipped_file['name']) < 8 || strcmp(substr($zipped_file['name'], 0, 8), '__MACOSX')) {
@@ -211,7 +211,7 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           $parts = explode('/', $dirname);
           $folder = $parts[0];
           $parts = explode('/', $pathinfo['dirname']);
-          $extra_extensions = (!strlen(variable_get('ixi_extra_extensions'))) ? null : explode(';', variable_get('ixi_extra_extensions'));
+          $extra_extensions = (!strlen(variable_get('ixi_extra_extensions'))) ? NULL : explode(';', variable_get('ixi_extra_extensions'));
           if (!strcmp($parts[0], $folder) // must be in the same folder as the XML
               && count($parts) == 2 // must have folder/images
               && !strcmp($parts[1], 'images') // must have second part of path be "images"
@@ -357,8 +357,8 @@ function ixi_upload_process_form_submit_delete($form, &$form_state) {
 }
 
 function _ixi_upload_view_diff($id) {
-  $sql = "SELECT ixq.xml_diff FROM {ixi_xml_queue} ixq WHERE id = :id LIMIT 1";
-  $result = db_query($sql, array(':id' => $id));
+  $sql = "SELECT ixq.xml_diff FROM {ixi_xml_queue} ixq WHERE id = :id";
+  $result = db_query_range($sql, 0, 1, array(':id' => $id));
   $build['breadcrumb'] = array(
     '#markup' => '<p>' . t('Return to <a href="@link">XML Process</a>.', array('@link' => url('admin/content/add/xml/process'))) . '</p>',
   );
@@ -373,8 +373,8 @@ function _ixi_upload_view_diff($id) {
 }
 
 function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
-  $sql = "SELECT ixq.xml FROM {ixi_xml_queue} ixq WHERE id = :id LIMIT 1";
-  $result = db_query($sql, array(':id' => $id));
+  $sql = "SELECT ixq.xml FROM {ixi_xml_queue} ixq WHERE id = :id";
+  $result = db_query_range($sql, 0, 1, array(':id' => $id));
   if ($result) {
     $row = $result->fetchAssoc();
     $form['xml'] = array(
@@ -413,8 +413,8 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
 }
 
 function _ixi_upload_process_queue($id, &$context) {
-  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, ixq.files, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
-  $result = db_query($sql, array(':id' => $id));
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, ixq.files, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id";
+  $result = db_query_range($sql, 0, 1, array(':id' => $id));
   if ($result) {
     $row = $result->fetchAssoc();
     if ($row['status']) {
@@ -477,8 +477,8 @@ function _ixi_upload_queue_finished($success, $results, $operations) {
 }
 
 function _ixi_upload_preview_fields($id) {
-  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id LIMIT 1";
-  $result = db_query($sql, array(':id' => $id));
+  $sql = "SELECT ixq.id, ixq.xid, ixq.xml, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id";
+  $result = db_query_range($sql, 0, 1, array(':id' => $id));
   if ($result) {
     $row = $result->fetchAssoc();
     $xml = simplexml_load_string($row['xml']);
@@ -498,7 +498,7 @@ function _ixi_upload_preview_fields($id) {
     foreach ($fields as $field => $options) {
       $row = array($options['field'], $options['value']);
       if ($options['override']) {
-        $check = db_query("SELECT io.oid FROM {ixi_overrides} io WHERE io.id = :id AND io.field = :field LIMIT 1", array(
+        $check = db_query_range("SELECT io.oid FROM {ixi_overrides} io WHERE io.id = :id AND io.field = :field", 0, 1, array(
           ':id' => $id,
           ':field' => $field,
         ));
@@ -563,8 +563,8 @@ function _ixi_upload_cleanup_queue(&$context) {
 }
 
 function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
-  $sql = "SELECT io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
-  $result = db_query($sql, array(':oid' => $oid));
+  $sql = "SELECT io.value FROM {ixi_overrides} io WHERE io.oid = :oid";
+  $result = db_query_range($sql, 0, 1, array(':oid' => $oid));
   $form = array();
   if ($result) {
     $row = $result->fetchAssoc();
@@ -585,8 +585,8 @@ function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
 }
 
 function _ixi_upload_preview_override_form_submit($form, &$form_state) {
-  $sql = "SELECT io.id, io.value FROM {ixi_overrides} io WHERE io.oid = :oid LIMIT 1";
-  $result = db_query($sql, array(':oid' => $form_state['values']['oid']));
+  $sql = "SELECT io.id, io.value FROM {ixi_overrides} io WHERE io.oid = :oid";
+  $result = db_query_range($sql, 0, 1, array(':oid' => $form_state['values']['oid']));
   $row = $result->fetchAssoc();
   if (strcmp($row['value'], $form_state['values']['value'])) {
     db_update('ixi_overrides')

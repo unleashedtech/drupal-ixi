@@ -99,8 +99,8 @@ function ixi_cron() {
 }
 
 function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_folder_structure = FALSE) {
-  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid LIMIT 1";
-  $result = db_query($sql, array(':xid' => $xid));
+  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid";
+  $result = db_query_range($sql, 0, 1, array(':xid' => $xid));
   if ($result && $result->rowCount()) {
     $row = $result->fetchAssoc();
     $file = file_load($row['fid']);
@@ -146,8 +146,8 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
 }
 
 function ixi_extract_data($xid, $filename) {
-  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid LIMIT 1";
-  $result = db_query($sql, array(':xid' => $xid));
+  $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid";
+  $result = db_query_range($sql, 0, 1, array(':xid' => $xid));
   if ($result && $result->rowCount()) {
     $row = $result->fetchAssoc();
     $file = file_load($row['fid']);

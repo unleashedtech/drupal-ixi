@@ -1,7 +1,14 @@
 <?php
 
 /**
- * Implements hook_node_info()
+ * @file
+ * IXI: XML Importer file
+ *
+ * Create the content types for the reference implementation.
+ */
+
+/**
+ * Implements hook_node_info().
  */
 function ixi_feature_node_info() {
   return array(
@@ -25,14 +32,14 @@ function ixi_feature_node_info() {
 }
 
 /**
- * Implement hook_form()
+ * Implements hook_form().
  */
 function ixi_feature_kennel_form($node, $form_state) {
   return node_content_form($node, $form_state);
 }
 
 /**
- * Implement hook_form()
+ * Implements hook_form().
  */
 function ixi_feature_dog_form($node, $form_state) {
   return node_content_form($node, $form_state);

@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * @file
+ * IXI: XML Importer file
+ *
+ * This module contains the code you must implement in your solution.
+ */
+
+/**
  * Implements hook_ixi_upload_group_node_alter().
  */
 function ixi_reference_ixi_upload_group_node_alter(&$node, $form_state) {
@@ -35,7 +42,7 @@ function ixi_reference_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $o
    * $images and $files arrays.
    */
   global $user;
-  $node = new StdClass();
+  $node = new stdClass();
   $node->type = 'ixi_feature_dog';
   node_object_prepare($node);
   $node->language = LANGUAGE_NONE;
