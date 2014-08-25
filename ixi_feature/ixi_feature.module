@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Implements hook_node_info()
+ */
+function ixi_feature_node_info() {
+  return array(
+    'ixi_feature_kennel' => array(
+      'name' => t('Kennel'),
+      'base' => 'ixi_feature_kennel',
+      'description' => t('Part of the IXI Reference Implementation. Dogs stay at the kennel.'),
+      'has_title' => TRUE,
+      'title_label' => t('Kennel Name'),
+    ),
+    'ixi_feature_dog' => array(
+      'name' => t('Dog'),
+      'base' => 'ixi_feature_dog',
+      'description' => t('Part of the IXI Reference Implementation. Man\'s best friend.'),
+      'has _title' => TRUE,
+      'title_label' => t('Dog Name'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_form()
+ */
+function ixi_feature_kennel_form($node, $form_state) {
+  return node_content_form($node, $form_state);
+}
+
+/**
+ * Implement hook_form()
+ */
+function ixi_feature_dog_form($node, $form_state) {
+  return node_content_form($node, $form_state);
+}

@@ -1,0 +1,6 @@
+name = IXI: XML Importer Reference Implementation Feature
+description = This is a dummy module that just creates content types that work with the sample files and the reference implementaion.
+core = 7.x
+package = IXI: XML Importer
+
+dependencies[] = ixi
