@@ -11,6 +11,7 @@ function ixi_feature_node_info() {
       'description' => t('Part of the IXI Reference Implementation. Dogs stay at the kennel.'),
       'has_title' => TRUE,
       'title_label' => t('Kennel Name'),
+      'locked' => TRUE,
     ),
     'ixi_feature_dog' => array(
       'name' => t('Dog'),
@@ -18,6 +19,7 @@ function ixi_feature_node_info() {
       'description' => t('Part of the IXI Reference Implementation. Man\'s best friend.'),
       'has _title' => TRUE,
       'title_label' => t('Dog Name'),
+      'locked' => TRUE,
     ),
   );
 }
