@@ -6,3 +6,5 @@ package = IXI: XML Importer
 dependencies[] = ixi
 dependencies[] = ixi_feature
 dependencies[] = ixi_upload
+
+files[] = ixi_reference.module

@@ -4,3 +4,7 @@ core = 7.x
 package = IXI: XML Importer
 
 dependencies[] = ixi
+
+files[] = ixi_upload.module
+files[] = ixi_upload.admin.inc
+files[] = ixi_upload.api.php

@@ -4,3 +4,6 @@ core = 7.x
 package = IXI: XML Importer
 
 dependencies[] = ixi
+
+files[] = ixi_feature.install
+files[] = ixi_feature.module
