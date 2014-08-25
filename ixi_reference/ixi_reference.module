@@ -23,3 +23,132 @@ function ixi_reference_ixi_upload_xml_alter(&$xml) {
    */
   $xml = iconv('UTF-8', 'UTF-8//TRANSLIT', $xml);
 }
+
+/**
+ * Implements hook_ixi_upload_parse_xml_file().
+ */
+function ixi_reference_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides) {
+  /* Using the provided example files, we're going to create new "Dog" nodes
+   * for each XML file in the archive. Our example files don't contain any
+   * images or extra files so we don't need to worry about those for now. See
+   * the included documentation for more information on working with the
+   * $images and $files arrays.
+   */
+  global $user;
+  $node = new StdClass();
+  $node->type = 'ixi_feature_dog';
+  node_object_prepare($node);
+  $node->language = LANGUAGE_NONE;
+  $node->uid = $user->uid;
+  // In this example, we aren't going to publish any of the new nodes.
+  $node->status = 0;
+  $node->promote= 0;
+  $node->sticky = 0;
+  $node->comment = 1;
+  /* Here is where we actually start saving data from the xml to the node. We
+   * start with the node title which is actually the dog's name. Since it can't
+   * be overridden (see below) we just set it. We've also expplicitly cast it
+   * to a string (see more information below).
+   */
+  $node->title = (string)$xml->name;
+  /* The next field has the possibility of being overridden so we need to
+   * check the overrides array to see if it's actually been overridden or not.
+   */
+  if (array_key_exists('bday', $overrides)) {
+    $node->field_ixi_feature_birthday[$node->language][0]['value'] = date('Y-m-d', strtotime($overrides['bday'])) . 'T00:00:00';
+  }
+  else {
+    $node->field_ixi_feature_birthday[$node->language][0]['value'] = date('Y-m-d', mktime(0, 0, 0, intval($xml->birthday['month']), intval($xml->birthday['day']), intval($xml->birthday['year']))) . 'T00:00:00';
+  }
+  /* The next field can also be overridden, but it relates directly to a drupal
+   * field and doesn't require as complicated processing.
+   */
+  $node->field_ixi_feature_color_breed[$node->language][0]['value'] = (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string)$xml->color . ' ' . (string)$xml->breed;
+  /* Now we'll work with this body text. This doesn't show up on the preview
+   * page (it could if we wanted it to), so we just straigt copy it from the
+   * XML into the node. The body settings should be adjusted to your needs.
+   */
+  $node->body[$node->language][0]['value'] = $xml->description;
+  $node->body[$node->language][0]['summary'] = text_summary($xml->description);
+  $node->body[$node->language][0]['format'] = 'full_html';
+  /* Here we would handle uploaded images and other files if we wanted. Our
+   * example files don't include any of either so we have nothing to do here.
+   * The following loops show how you can access them:
+   *//* <-- delete here to uncomment
+  foreach ($images as $location => $filename) {
+    // $location is where the image was stored
+    // $filename is the original filename from the archive
+  }/*/
+  /* There is a similar process for extra files, but we would also need to
+   * decide what to do with them, whereas images are automatically extracted.
+   *//* <-- delete here to uncomment
+  foreach ($files as $file) {
+    // Get some basic information about the file, maybe we only want to handle
+    // certain extensions (for example pdfs):
+    //
+    $info = pathinfo($file);
+    if (!strcmp($info['extension'], 'pdf')) {
+      // We can either get the raw data, or simply extract the file to a
+      // location see ixi_extract_data and ixi_extract_to in the included
+      // documentation for more information how how these two functions work.
+      ixi_extract_to($ids['xid'], $file);
+    }
+  }/*/
+  /* Now we attempt to actually save the node to the database. Notice that we
+   * return the new nid, or FALSE if we fail. You can return FALSE at any time
+   * in your function whenever you encounter an error. You may also want to
+   * log more information to watchdog if possible.
+   */
+  if ($node = node_submit($node)) {
+    node_save($node);
+    return $node->nid;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_ixi_upload_preview_fields().
+ */
+function ixi_reference_ixi_upload_preview_fields($xml, $overrides) {
+  /* Here we get to decide which fields show in the preview table, as well as
+   * which are able to be overridden. This function must return an array.
+   */
+  $rows = array();
+  /* The name of the dog is also our title. (See above where we actually
+   * assign it to the node). We have also set it to not allow overrides. Note
+   * that we've also explicitly typecast the SimpleXML object to a string.
+   * While this particular cast isn't required, sometimes when we call a
+   * function it might complain if the type isn't correct, so we do this for
+   * consistency.
+   */
+  $rows['name'] = array(
+    'field' => t('Name'),
+    'value' => (string)$xml->name,
+    'override' => FALSE,
+  );
+  /* This is a more complicated example to show off the flexibility. The "bday"
+   * field is made up of three different parts of the XML, however it can also
+   * be overridden if desired. However, if you're worried about getting
+   * possible bad data in the override when it comes time to save it to the
+   * database with strtotime (see above), you may wish to disallow the override
+   * here.
+   */
+  $rows['bday'] = array(
+    'field' => t('Birthday'),
+    'value' => (array_key_exists('bday', $overrides)) ? $overrides['bday'] : date('j F Y', mktime(0, 0, 0, intval($xml->birthday['month']), intval($xml->birthday['day']), intval($xml->birthday['year']))),
+    'override' => TRUE,
+  );
+  /* Whereas the "bday" field corresponded to the birthday field in Drupal,
+   * this example corresponds directly to the color_breed field (see above
+   * for assignment), however notice that again we're pulling  from two
+   * different tags in the XML.
+   */
+  $rows['color_breed'] = array(
+    'field' => t('Color and Breed'),
+    'value' => (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string)$xml->color . ' ' . (string)$xml->breed,
+    'override' => TRUE,
+  );
+  return $rows;
+}
