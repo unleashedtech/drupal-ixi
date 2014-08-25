@@ -2,6 +2,8 @@
 
 ## Installation
 
+It is always necessary to include and install the main IXI and the IXI Uploader modules. The main module contains all of the configuration options and menus, and the uploader module handles uploading and extracting the archive. Also included are two reference implementation modules: the main implementation module which contains all of the code that needs to be implemented for a custom solution, and the feature module which simply creates content types that work with supplied sample files and the reference implementation code and does not need to be implemented.
+
 Upon installation the module will attempt to create the directory `private://ixi_archives` so that we do not expose uploaded archives to the public. If installation fails, check the permissions of the private files directory.
 
 It is also required to have the zip extension and domdocument class available.
