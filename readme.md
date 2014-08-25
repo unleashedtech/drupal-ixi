@@ -45,9 +45,9 @@ You must implement this hook or no new nodes will be created when processing the
 
 #### Return
 
-The function's return value is not very important unless there was an error. The return value is not used later, however one option is to return the value of e.g., the nid of a new node that was created. If there was an error then you should return FALSE.
+The function's return value is not very important unless there was an error. The return value is not used later, however one option is to return the value of e.g., the nid of a new node that was created. If there was an error then you should return `FALSE`.
 
-### hook_ixi_upload_preview_fields *required*
+### `hook_ixi_upload_preview_fields` *required*
 
 You must implement this hook in order to show fields when clicking the Preview link before processing XML. The hook gets passed a SimpleXML object representing the XML and an array of overrides similar to the parse_xml_file hook from above. The hook must return an associative two-dimensional array with the keys being the fields. You can choose whichever name you wish, they do not need to correspond to fields in XML or in the node. Each key corresponds to a row in the table on the preview page. The value of each key has three values: field, value, and override. The field is the human readable name of the field, value is its value (You probably want to check for an override here, if enabled), and override is a boolean denoting whether it should be possible to overwrite the field before processing.
 
@@ -77,7 +77,7 @@ array(
 
 ## Functions
 
-### ixi_extract_to
+### `ixi_extract_to`
 
 You can call this function with an xid and a filename from the associated archive. The default destination is the root of the public files directory, however the third parameter allows you to change this to whatever you'd like, such as `public://my_files` or `private://`. The fourth parameter, also optional determines whether to preserve the folder structure. If true, then files will be extracted in the same directories (appended to the destination) that they appear in in the archive. If false, then files will be uploaded directly to the root of the destination directory. This function returns the full path of the extracted file (including if if it was e.g., renamed).
 
@@ -92,7 +92,7 @@ You can call this function with an xid and a filename from the associated archiv
 
 The function returns the path of the extracted file on the server (in case it was e.g., renamed to avoid conflicting with a file of the same name).
 
-### ixi_extract_data
+### `ixi_extract_data`
 
 You can call this function if you would like the raw data stream of a file
 from the archive. You just need to pass the xid, and the filename from the
