@@ -56,6 +56,21 @@ function _ixi_feature_installed_fields($type) {
           'label' => $t('Color and Breed'),
           'type' => 'text',
         ),
+        'field_ixi_feature_birthday' => array(
+          'field_name' => 'field_ixi_feature_birthday',
+          'label' => $t('Birthday'),
+          'type' => 'datetime',
+          'settings' => array(
+            'granularity' => array(
+              'month' => 'month',
+              'day' => 'day',
+              'hour' => 0,
+              'minute' => 0,
+              'year' => 'year',
+              'second' => 0,
+            ),
+          ),
+        ),
       );
   }
 }
@@ -80,6 +95,13 @@ function _ixi_feature_installed_instances($type) {
           'type' => 'text',
           'label' => $t('Color and Breed'),
           'widget' => array('type' => 'text_textfield'),
+          'display' => array(),
+        ),
+        'field_ixi_feature_birthday' => array(
+          'field_name' => 'field_ixi_feature_birthday',
+          'type' => 'datetime',
+          'label' => $t('Birthday'),
+          'widget' => array('type' => 'date_text'),
           'display' => array(),
         ),
       );
