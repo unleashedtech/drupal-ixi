@@ -4,4 +4,5 @@ core = 7.x
 package = IXI: XML Importer
 
 dependencies[] = ixi
+dependencies[] = ixi_feature
 dependencies[] = ixi_upload
