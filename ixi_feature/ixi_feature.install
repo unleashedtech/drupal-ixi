@@ -51,9 +51,9 @@ function _ixi_feature_installed_fields($type) {
       );
     case 'ixi_feature_dog':
       return array(
-        'field_ixi_feature_breed' => array(
-          'field_name' => 'field_ixi_feature_breed',
-          'label' => t('Dog Breed'),
+        'field_ixi_feature_color_breed' => array(
+          'field_name' => 'field_ixi_feature_color_breed',
+          'label' => $t('Color and Breed'),
           'type' => 'text',
         ),
       );
@@ -75,10 +75,10 @@ function _ixi_feature_installed_instances($type) {
       );
     case 'ixi_feature_dog':
       return array(
-        'field_ixi_feature_breed' => array(
-          'field_name' => 'field_ixi_feature_breed',
+        'field_ixi_feature_color_breed' => array(
+          'field_name' => 'field_ixi_feature_color_breed',
           'type' => 'text',
-          'label' => $t('Dog Breed'),
+          'label' => $t('Color and Breed'),
           'widget' => array('type' => 'text_textfield'),
           'display' => array(),
         ),
