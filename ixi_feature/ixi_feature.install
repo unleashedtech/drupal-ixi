@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * @file
+ * IXI: XML Importer file
+ *
+ * Install file for the xml importer feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ixi_feature_install() {
+  node_types_rebuild();
+  $types = node_type_get_types();
+  node_add_body_field($types['ixi_feature_kennel']);
+  node_add_body_field($types['ixi_feature_dog']);
+  _ixi_feature_add_custom_fields('ixi_feature_kennel');
+  _ixi_feature_add_custom_fields('ixi_feature_dog');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ixi_feature_uninstall() {
+  $types = array('ixi_feature_kennel', 'ixi_feature_dog');
+  foreach ($types as $type) {
+    $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+    $result = db_query($sql, array(':type' => $type));
+    $nodeids = array();
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    node_delete_multiple($nodeids);
+    _ixi_feature_delete_custom_fields($type);
+    node_type_delete($type);
+    field_purge_batch(500);
+  }
+}
+
+function _ixi_feature_installed_fields($type) {
+  $t = get_t();
+  switch ($type) {
+    case 'ixi_feature_kennel':
+      return array(
+        'field_ixi_feature_location' => array(
+          'field_name' => 'field_ixi_feature_location',
+          'label' => $t('Kennel Location'),
+          'type' => 'text',
+        ),
+      );
+    case 'ixi_feature_dog':
+      return array(
+        'field_ixi_feature_breed' => array(
+          'field_name' => 'field_ixi_feature_breed',
+          'label' => t('Dog Breed'),
+          'type' => 'text',
+        ),
+      );
+  }
+}
+
+function _ixi_feature_installed_instances($type) {
+  $t = get_t();
+  switch ($type) {
+    case 'ixi_feature_kennel':
+      return array(
+        'field_ixi_feature_location' => array(
+          'field_name' => 'field_ixi_feature_location',
+          'type' => 'text',
+          'label' => $t('Kennel Location'),
+          'widget' => array('type' => 'text_textfield'),
+          'display' => array(),
+        ),
+      );
+    case 'ixi_feature_dog':
+      return array(
+        'field_ixi_feature_breed' => array(
+          'field_name' => 'field_ixi_feature_breed',
+          'type' => 'text',
+          'label' => $t('Dog Breed'),
+          'widget' => array('type' => 'text_textfield'),
+          'display' => array(),
+        ),
+      );
+  }
+}
+
+function _ixi_feature_add_custom_fields($type) {
+  foreach (_ixi_feature_installed_fields($type) as $field) {
+    field_create_field($field);
+  }
+  foreach (_ixi_feature_installed_instances($type) as $fieldinstance) {
+    $fieldinstance['entity_type'] = 'node';
+    $fieldinstance['bundle'] = $type;
+    field_create_instance($fieldinstance);
+  }
+}
+
+function _ixi_feature_delete_custom_fields($type) {
+  foreach (array_keys(_ixi_feature_installed_fields($type)) as $field) {
+    field_delete_field($field);
+  }
+  $instances = field_info_instances('node', $type);
+  foreach ($instances as $instance_name => $fieldinstance) {
+    field_delete_instance($fieldinstance);
+  }
+}
