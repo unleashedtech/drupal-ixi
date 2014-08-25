@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dog>
+	<name>Simba</name>
+	<birthday day="4" month="24" year="2011"/>
+	<breed>Great Dane</breed>
+	<color>Brown</color>
+	<description>Simba is a big dog!</description>
+</Dog>

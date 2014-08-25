@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dog>
+	<name>Buddy</name>
+	<birthday day="5" month="12" year="2012"/>
+	<breed>Labrador Retriever</breed>
+	<color>Brown</color>
+	<description>Buddy is a fun dog!</description>
+</Dog>
