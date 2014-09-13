@@ -29,7 +29,7 @@ function ixi_feature_uninstall() {
     $result = db_query($sql, array(':type' => $type));
     $nodeids = array();
     foreach ($result as $row) {
-        $nodeids[] = $row->nid;
+      $nodeids[] = $row->nid;
     }
     node_delete_multiple($nodeids);
     _ixi_feature_delete_custom_fields($type);
@@ -38,6 +38,9 @@ function ixi_feature_uninstall() {
   }
 }
 
+/**
+ * Get an array of the fields for a given content type.
+ */
 function _ixi_feature_installed_fields($type) {
   $t = get_t();
   switch ($type) {
@@ -49,6 +52,7 @@ function _ixi_feature_installed_fields($type) {
           'type' => 'text',
         ),
       );
+
     case 'ixi_feature_dog':
       return array(
         'field_ixi_feature_color_breed' => array(
@@ -75,6 +79,9 @@ function _ixi_feature_installed_fields($type) {
   }
 }
 
+/**
+ * Get the field instances for a given content type.
+ */
 function _ixi_feature_installed_instances($type) {
   $t = get_t();
   switch ($type) {
@@ -88,6 +95,7 @@ function _ixi_feature_installed_instances($type) {
           'display' => array(),
         ),
       );
+
     case 'ixi_feature_dog':
       return array(
         'field_ixi_feature_color_breed' => array(
@@ -108,6 +116,9 @@ function _ixi_feature_installed_instances($type) {
   }
 }
 
+/**
+ * Given a content type create the fields and field instances.
+ */
 function _ixi_feature_add_custom_fields($type) {
   foreach (_ixi_feature_installed_fields($type) as $field) {
     field_create_field($field);
@@ -119,6 +130,9 @@ function _ixi_feature_add_custom_fields($type) {
   }
 }
 
+/**
+ * Given a content type remove the field instances and delete the field.
+ */
 function _ixi_feature_delete_custom_fields($type) {
   foreach (array_keys(_ixi_feature_installed_fields($type)) as $field) {
     field_delete_field($field);

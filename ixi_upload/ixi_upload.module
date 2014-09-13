@@ -72,6 +72,9 @@ function ixi_upload_menu() {
   return $items;
 }
 
+/**
+ * Set the default parameters.
+ */
 function _ixi_upload_diff_to_arg($arg) {
   if ($arg == '%') {
     return 'none';
@@ -81,6 +84,9 @@ function _ixi_upload_diff_to_arg($arg) {
   }
 }
 
+/**
+ * Set the default parameters.
+ */
 function _ixi_upload_xml_edit_to_arg($arg) {
   if ($arg == '%') {
     return 'none';
@@ -90,6 +96,9 @@ function _ixi_upload_xml_edit_to_arg($arg) {
   }
 }
 
+/**
+ * Set the default parameters.
+ */
 function _ixi_upload_preview_to_arg($arg) {
   if ($arg == '%') {
     return 'none';
@@ -99,6 +108,9 @@ function _ixi_upload_preview_to_arg($arg) {
   }
 }
 
+/**
+ * Set the default parameters.
+ */
 function _ixi_upload_preview_override_to_arg($arg) {
   if ($arg == '%') {
     return 'none';

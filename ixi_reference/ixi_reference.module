@@ -49,7 +49,7 @@ function ixi_reference_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $o
   $node->uid = $user->uid;
   // In this example, we aren't going to publish any of the new nodes.
   $node->status = 0;
-  $node->promote= 0;
+  $node->promote = 0;
   $node->sticky = 0;
   $node->comment = 1;
   /* Here is where we actually start saving data from the xml to the node. We
@@ -57,7 +57,7 @@ function ixi_reference_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $o
    * be overridden (see below) we just set it. We've also expplicitly cast it
    * to a string (see more information below).
    */
-  $node->title = (string)$xml->name;
+  $node->title = (string) $xml->name;
   /* The next field has the possibility of being overridden so we need to
    * check the overrides array to see if it's actually been overridden or not.
    */
@@ -70,7 +70,7 @@ function ixi_reference_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $o
   /* The next field can also be overridden, but it relates directly to a drupal
    * field and doesn't require as complicated processing.
    */
-  $node->field_ixi_feature_color_breed[$node->language][0]['value'] = (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string)$xml->color . ' ' . (string)$xml->breed;
+  $node->field_ixi_feature_color_breed[$node->language][0]['value'] = (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string) $xml->color . ' ' . (string) $xml->breed;
   /* Now we'll work with this body text. This doesn't show up on the preview
    * page (it could if we wanted it to), so we just straigt copy it from the
    * XML into the node. The body settings should be adjusted to your needs.
@@ -132,7 +132,7 @@ function ixi_reference_ixi_upload_preview_fields($xml, $overrides) {
    */
   $rows['name'] = array(
     'field' => t('Name'),
-    'value' => (string)$xml->name,
+    'value' => (string) $xml->name,
     'override' => FALSE,
   );
   /* This is a more complicated example to show off the flexibility. The "bday"
@@ -154,7 +154,7 @@ function ixi_reference_ixi_upload_preview_fields($xml, $overrides) {
    */
   $rows['color_breed'] = array(
     'field' => t('Color and Breed'),
-    'value' => (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string)$xml->color . ' ' . (string)$xml->breed,
+    'value' => (array_key_exists('color_breed', $overrides)) ? $overrides['color_breed'] : (string) $xml->color . ' ' . (string) $xml->breed,
     'override' => TRUE,
   );
   return $rows;

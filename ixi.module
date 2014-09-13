@@ -23,7 +23,7 @@ function ixi_help($path, $arg) {
       $output .= '<h3>' . t('Implementation') . '</h3>';
       $output .= '<p>' . t('You must implement both the <code>hook_ixi_upload_parse_xml_file</code> and <code>hook_ixi_upload_preview_fields</code> hooks. Please see the included readme, ixi_upload.api.php and the reference implementation for help and information about how to implement the hooks.') . '</p>';
       $output .= '<h3>' . t('Other Information') . '</h3>';
-      $output .= '<p>' . t('The module saves uploaded archives in the private files folder under &quot;ixi_archives&quot; so that they aren\'t exposed to the public prior to processing.') . '</p>';
+      $output .= '<p>' . t("The module saves uploaded archives in the private files folder under &quot;ixi_archives&quot; so that they aren't exposed to the public prior to processing.") . '</p>';
       return $output;
   }
 }
@@ -73,10 +73,14 @@ function ixi_menu() {
  */
 function ixi_cron() {
   if (variable_get('ixi_garbage_collect') == 1) {
+    // Find all of the uploads where all of the records inside have been
+    // processed. Note that updating the upload takes place during processing.
     $sql = "SELECT iau.xid, iau.fid FROM {ixi_archive_uploads} iau WHERE iau.processed = '1'";
     $result = db_query($sql);
     if ($result) {
       while ($row = $result->fetchAssoc()) {
+        // Find all of the records for a given uploads and purge the overrides
+        // of each.
         $o_sql = "SELECT ixq.id FROM {ixi_xml_queue} ixq WHERE ixq.xid = :xid";
         $o_result = db_query($o_sql, array(':xid' => $row['xid']));
         foreach ($o_result as $o_row) {
@@ -84,20 +88,52 @@ function ixi_cron() {
             ->condition('id', $o_row->id, '=')
             ->execute();
         }
+
+        // Delete the archive.
         $file = file_load($row['fid']);
         file_delete($file);
+
+        // Delete all the records and the upload record itself.
         db_delete('ixi_archive_uploads')
           ->condition('xid', $row['xid'], '=')
           ->execute();
         db_delete('ixi_xml_queue')
           ->condition('xid', $row['xid'], '=')
           ->execute();
+
+        // Log what we did.
         watchdog('ixi', 'Deleted file with fid: %fid and associated records: %xid.', array('%fid' => $row['fid'], '%xid' => $row['xid']), WATCHDOG_DEBUG);
       }
     }
   }
 }
 
+/**
+ * Extract a file from the archive.
+ *
+ * By passing the xid of the archive you can extract a file by filename (which
+ * is the full path inside the archive) to somewhere on the server, optionally
+ * preserving the internal folder structure.
+ *
+ * @param int $xid
+ *   The xid of the archive from which to extract.
+ *
+ * @param string $filename
+ *   The full path of the file inside the archive. Note that this is what you
+ *   get by default in the $files array in hook_ixi_upload_parse_xml_file.
+ *
+ * @param string $destination
+ *   Where to extract the files. Defaults to 'public://' but this could also
+ *   be e.g., 'private://' or some arbitrary directory inside either.
+ *
+ * @param bool $preserve_folder_structure
+ *   Whether to preserve the internal structure of the archive when extracting
+ *   the file. If true, the folders will be appended to $destination.
+ *
+ * @return string
+ *   The function returns a string with the path of the extracted file, which
+ *   takses into account if the filename was e.g., renamed.
+ */
 function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_folder_structure = FALSE) {
   $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid";
   $result = db_query_range($sql, 0, 1, array(':xid' => $xid));
@@ -105,14 +141,19 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
     $row = $result->fetchAssoc();
     $file = file_load($row['fid']);
     $zip = new ZipArchive();
+    // Open the zip file based on the real path of the archive on the server.
     if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
       if (($fp = $zip->getStream($filename)) !== FALSE) {
+        // Read the data in until we reach end of file.
         $data = '';
         while (!feof($fp)) {
           $data .= fread($fp, 2);
         }
         fclose($fp);
+        // Get some information about the filename and path.
         $pathinfo = pathinfo($filename);
+        // If preserve folder structure then append the internal path onto
+        // destination. Also check for trailing slashes!
         if ($preserve_folder_structure) {
           if (substr($destination, -1) != '/') {
             $destination .= '/' . $pathinfo['dirname'];
@@ -121,6 +162,7 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
             $destination .= $pathinfo['dirname'];
           }
         }
+        // Attempt to create the desired directory and make it writeable.
         if (file_prepare_directory($destination, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
           if (substr($destination, -1) != '/') {
             $destination .= '/';
@@ -145,6 +187,23 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
   }
 }
 
+/**
+ * Extract a file from an archive and read it into memory.
+ *
+ * This function is similar to ixi_extract_to, only instead of extracting the
+ * file onto the disk it instead reads it into memory and and returns the raw
+ * data.
+ *
+ * @param int $xid
+ *   The xid of the archive from which to extract.
+ *
+ * @param string $filename
+ *   The full path of the file inside the archive. Note that this is what you
+ *   get by default in the $files array in hook_ixi_upload_parse_xml_file.
+ *
+ * @return string
+ *   The raw data stream of the extracted file.
+ */
 function ixi_extract_data($xid, $filename) {
   $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau WHERE iau.xid = :xid";
   $result = db_query_range($sql, 0, 1, array(':xid' => $xid));
@@ -152,8 +211,11 @@ function ixi_extract_data($xid, $filename) {
     $row = $result->fetchAssoc();
     $file = file_load($row['fid']);
     $zip = new ZipArchive();
+    // Open the zip file based on the real path of the file on the server.
     if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
+      // Get a file pointer of the desired filename.
       if (($fp = $zip->getStream($filename)) !== FALSE) {
+        // Read the data in until we reach end of file and then return.
         $data = '';
         while (!feof($fp)) {
           $data .= fread($fp, 2);

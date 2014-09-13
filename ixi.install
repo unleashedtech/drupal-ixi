@@ -26,6 +26,8 @@ function ixi_uninstall() {
   variable_del('ixi_garbage_collect');
   variable_del('ixi_image_extensions');
   variable_del('ixi_extra_extensions');
+
+  // Delete any remaining uploaded archives and remove the directory.
   $sql = "SELECT iau.fid FROM {ixi_archive_uploads} iau";
   $result = db_query($sql);
   foreach ($result as $row) {
@@ -40,10 +42,14 @@ function ixi_uninstall() {
  */
 function ixi_requirements($phase) {
   $requirements = array();
-  // ensure translations don't break during installation
+
+  // Ensure translations don't break during installation.
   $t = get_t();
+
   switch ($phase) {
     case 'install':
+      // Make sure that we have a directory to store uploaded archives before
+      // they've been processed.
       $directory = 'private://ixi_archives';
       if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
         $requirements['ixi_archive_dir'] = array(
@@ -53,6 +59,9 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+
+      // We require the zip extension in order to read from archives. Make
+      // sure that it's installed and has been loaded.
       if (!extension_loaded('zip')) {
         $requirements['ixi_zip_extension'] = array(
           'title' => $t('Zip Extension'),
@@ -60,6 +69,9 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+
+      // We use the DomDocument class to try and correct bad XML. Make sure
+      // that it's available.
       if (!class_exists('DOMDocument')) {
         $requirements['ixi_phpdom'] = array(
           'title' => $t('PHP Document Object Model'),
@@ -67,19 +79,28 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+
       break;
-    case 'update': break;
+
+    case 'update':
+      break;
+
     case 'runtime':
+      // Check to make sure that the archive directory still exists and is
+      // writeable. If not, provide a link for the user to recreate it.
       $directory = 'private://ixi_archives';
       if (!file_prepare_directory($directory)) {
         $description = $t('The archive directory is missing or not writable. Please check %directory.', array('%directory' => $directory));
         $requirements['ixi_archive_dir'] = array(
           'title' => 'XML Archive Directory',
-          'description' => $description . ' ' . l(t('Recreate archive directory'), 'admin/reports/status/ixi/archive_directory'),
+          'description' => $description . ' ' . l($t('Recreate archive directory'), 'admin/reports/status/ixi/archive_directory'),
           'value' => 'Missing or Not Writable',
           'severity' => REQUIREMENT_ERROR,
         );
       }
+
+      // Make sure that the module has been properly configured (we require
+      // that at least the group node and fields have been set.
       if (is_null(variable_get('ixi_group_content_type')) || is_null(variable_get('ixi_group_fields'))) {
         $description = $t('The IXI module has not been configured! Please set group node options.');
         $requirements['ixi_config'] = array(
@@ -89,8 +110,10 @@ function ixi_requirements($phase) {
           'severity' => REQUIREMENT_ERROR,
         );
       }
+
       break;
   }
+
   return $requirements;
 }
 

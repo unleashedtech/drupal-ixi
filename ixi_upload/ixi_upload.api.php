@@ -8,10 +8,10 @@
 /**
  * Alter the group node before saving it.
  *
- * @param $node
+ * @param object $node
  *   This is the new node object that we will be saving.
  *
- * @param $form_state
+ * @param array $form_state
  *   This is the submitted form_state so that you can access other fields if
  *   needed.
  */
@@ -21,7 +21,7 @@ function hook_ixi_upload_group_node_alter(&$node, $form_state) {
 /**
  * Alter the raw XML string before it's saved to the database.
  *
- * @param $xml
+ * @param string $xml
  *   This is the raw xml string, not an object. You can convert it if you
  *   need to, but it must be converted back before the function returns.
  */
@@ -29,27 +29,29 @@ function hook_ixi_upload_xml_alter(&$xml) {
 }
 
 /**
- * Process an XML file. You can do whatever you need to here: create a new
- * node or taxonomy, for example.
+ * Process an XML file.
  *
- * @param $xml
+ * You can do whatever you need to here: create a new node or taxonomy, for
+ * example.
+ *
+ * @param object $xml
  *   A SimpleXml object representing the xml.
  *
- * @param $images
+ * @param array $images
  *   An array keyed by original filename in the archive with values of the file
  *   in the drupal filesystem.
  *
- * @param $files
+ * @param array $files
  *   An array of additonal files in the same folder as the XML file. These can
  *   be retrived by calling ixi_extract_to to extract the file to the public
  *   folder or ixi_extract_data to get a raw stream of the uncompressed file.
  *
- * @param $ids
+ * @param array $ids
  *   An array with useful ids: 'id' is the xml queue id, 'xid' is the upload id
  *   and 'group_nid' is the node id of the group node that was created when
  *   the archive was uploaded.
  *
- * @param $overrides
+ * @param array $overrides
  *   An array of fields as defined by the developer as keys with overridden
  *   values (only if they have actually been overridden).
  *
@@ -62,12 +64,12 @@ function hook_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides)
 }
 
 /**
- * Return rows of a preview fields table with the field name and its value
+ * Return rows of a preview fields table with the field name and its value.
  *
- * @param $xml
+ * @param object $xml
  *   A SimpleXml object representing the the xml.
  *
- * @param $overrides
+ * @param array $overrides
  *   An array of fields as defined by the developer as keys with overridden
  *   values (only if they have actually been overridden).
  *

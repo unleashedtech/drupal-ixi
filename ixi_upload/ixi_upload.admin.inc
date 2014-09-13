@@ -11,11 +11,11 @@
  * Form constructor for uploading an archive of XML files.
  *
  * @see http://www.alexweber.com.br/en/articles/how-manually-add-entity-field-forms-custom-drupal-form
- *   for information on including field forms in the form.
  */
 function ixi_upload_upload_form($form, &$form_state) {
   $form['#attributes']['enctype'] = 'multipart/form-data';
-  $form['#parents'] = array(); // necessary for field_default_form() to not yell at us
+  // Necessary for field_default_form() to not yell at us.
+  $form['#parents'] = array();
   $entity_type = 'node';
   $bundle_name = variable_get('ixi_group_content_type');
   $entity = NULL;
@@ -62,6 +62,9 @@ function ixi_upload_upload_form($form, &$form_state) {
   return $form;
 }
 
+/**
+ * Submission handler for the upload form.
+ */
 function ixi_upload_upload_form_submit($form, &$form_state) {
   $filepath = 'private://ixi_archives/';
   $file = file_save_upload('fid', array('file_validate_extensions' => array('zip')), $filepath);
@@ -112,6 +115,9 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
 
 }
 
+/**
+ * Create a new node that will serve as the group node for this upload.
+ */
 function _ixi_upload_create_group_node($form_state, $fid, &$context) {
   global $user;
   $node = new stdClass();
@@ -136,7 +142,7 @@ function _ixi_upload_create_group_node($form_state, $fid, &$context) {
     $node->$field_name = $form_state['values'][$field_name];
   }
 
-  // call new hook to allow altering of node before it's saved
+  // Call new hook to allow altering of node before it's saved.
   drupal_alter('ixi_upload_group_node', $node, $form_state);
 
   if ($node = node_submit($node)) {
@@ -150,7 +156,7 @@ function _ixi_upload_create_group_node($form_state, $fid, &$context) {
       ->execute();
   }
 
-  // store the new xid to the context array so we can reference it later
+  // Store the new xid to the context array so we can reference it later.
   $context['results'][] = $xid;
 
   $context['results'][] = t('New @content_type id: @nid.', array(
@@ -160,6 +166,17 @@ function _ixi_upload_create_group_node($form_state, $fid, &$context) {
   $context['message'] = t('Creating the group node.');
 }
 
+/**
+ * Unzip an XML file and pre-process it.
+ *
+ * Here we unzip the XML file, read it into memory. Create an original
+ * checksum then run the XML through DomDocument to get prettier XML (so we
+ * can present it on the edit form late) and then compute a new checksum and
+ * a diff. Attempt to load the XML with SimpleXML and save the status, then
+ * look for other files in the same folder as the XML file. Files in the
+ * 'images' folder that are also in the images extension configuration get
+ * saved to one array while everything else gets saved to another.
+ */
 function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
   $file = file_load($fid);
   $zip = new ZipArchive();
@@ -212,19 +229,31 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           $folder = $parts[0];
           $parts = explode('/', $pathinfo['dirname']);
           $extra_extensions = (!strlen(variable_get('ixi_extra_extensions'))) ? NULL : explode(';', variable_get('ixi_extra_extensions'));
-          if (!strcmp($parts[0], $folder) // must be in the same folder as the XML
-              && count($parts) == 2 // must have folder/images
-              && !strcmp($parts[1], 'images') // must have second part of path be "images"
-              && isset($pathinfo['extension']) // must have a file extension
-              && in_array($pathinfo['extension'], variable_get('ixi_image_extensions')) // must be valid image extension
-              && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
+          // The images array must satisfy the following criteria:
+          //   1. Must be in the same folder as the XML.
+          //   2. Must have two parts (folder/images)
+          //   3. And the second part must be called "images".
+          //   4. There must be a file extension
+          //   5. And it must be in the list of allowed image extensions.
+          //   6. Finally, we want to exclude the Mac-specific file .DS_Store.
+          if (!strcmp($parts[0], $folder)
+              && count($parts) == 2
+              && !strcmp($parts[1], 'images')
+              && isset($pathinfo['extension'])
+              && in_array($pathinfo['extension'], variable_get('ixi_image_extensions'))
+              && strcmp($pathinfo['basename'], '.DS_Store')
           ) {
             $images[] = array($i => $zipped_file['name']);
           }
-          elseif (!strcmp($parts[0], $folder) // must be in the same folder as the XML
-                  && isset($pathinfo['extension']) // must have a file extension
-                  && (!is_array($extra_extensions) || in_array($pathinfo['extension'], $extra_extensions)) // only get allowed extra extensions
-                  && strcmp($pathinfo['basename'], '.DS_Store') // exclude Mac-specific file .DS_Store
+          // Everything else must satisfy the following criteria:
+          //   1. Must be in the same folder as the XML.
+          //   2. There must be a file extension
+          //   3. And it must be in the list of allowed extensions.
+          //   4. Finally, we want to exlude the Mac-specific file .DS_Store.
+          elseif (!strcmp($parts[0], $folder)
+                  && isset($pathinfo['extension'])
+                  && (!is_array($extra_extensions) || in_array($pathinfo['extension'], $extra_extensions))
+                  && strcmp($pathinfo['basename'], '.DS_Store')
           ) {
             $files[$i] = $zipped_file['name'];
           }
@@ -255,6 +284,9 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
   $context['message'] = t('Checking XML file %xml_filename.', array('%xml_filename' => $basename));
 }
 
+/**
+ * The finished function for the uploaded archive, pre-processing batch.
+ */
 function _ixi_upload_upload_finished($success, $results, $operations) {
   if ($success) {
     drupal_set_message(t('@count files processed.', array('@count' => count($results) - 2)));
@@ -273,7 +305,7 @@ function _ixi_upload_upload_finished($success, $results, $operations) {
 }
 
 /**
- * Form constructor for processing a queue of XML files.
+ * Form constructor for processing or deleting a queue of XML files.
  */
 function ixi_upload_process_form($form, &$form_state) {
   $form = array();
@@ -322,6 +354,9 @@ function ixi_upload_process_form($form, &$form_state) {
   return $form;
 }
 
+/**
+ * Submission handler for processing files from the process table.
+ */
 function ixi_upload_process_form_submit_process($form, &$form_state) {
   $operations = array();
   foreach ($form_state['values']['process'] as $queue_id) {
@@ -345,6 +380,9 @@ function ixi_upload_process_form_submit_process($form, &$form_state) {
   $form_state['redirect'] = 'admin/content/add/xml/process';
 }
 
+/**
+ * Submission handler for deleting records from the process table.
+ */
 function ixi_upload_process_form_submit_delete($form, &$form_state) {
   db_delete('ixi_xml_queue')
     ->condition('id', $form_state['values']['process'], 'IN')
@@ -352,10 +390,14 @@ function ixi_upload_process_form_submit_delete($form, &$form_state) {
   db_delete('ixi_overrides')
     ->condition('id', $form_state['values']['process'], 'IN')
     ->execute();
-  $context = array(); // set a dummy context variable so we can reuse the batch cleanup
+  // Set a dummy context variable so we can reuse the batch cleanup.
+  $context = array();
   _ixi_upload_cleanup_queue($context);
 }
 
+/**
+ * Show the diff from the original XML to the cleaned XML.
+ */
 function _ixi_upload_view_diff($id) {
   $sql = "SELECT ixq.xml_diff FROM {ixi_xml_queue} ixq WHERE id = :id";
   $result = db_query_range($sql, 0, 1, array(':id' => $id));
@@ -372,6 +414,9 @@ function _ixi_upload_view_diff($id) {
   return $build;
 }
 
+/**
+ * Form constructor for editing raw XML.
+ */
 function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
   $sql = "SELECT ixq.xml FROM {ixi_xml_queue} ixq WHERE id = :id";
   $result = db_query_range($sql, 0, 1, array(':id' => $id));
@@ -393,6 +438,9 @@ function _ixi_upload_edit_xml_form($form, &$form_state, $id) {
   return $form;
 }
 
+/**
+ * Submission handler for the raw XML edit form.
+ */
 function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
   libxml_use_internal_errors(TRUE);
   if (simplexml_load_string($form_state['values']['xml']) === FALSE) {
@@ -412,6 +460,9 @@ function _ixi_upload_edit_xml_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/content/add/xml/process';
 }
 
+/**
+ * Process a selected XML file as part of a batch process.
+ */
 function _ixi_upload_process_queue($id, &$context) {
   $sql = "SELECT ixq.id, ixq.xid, ixq.xml, ixq.status, ixq.images, ixq.files, iau.nid, iau.fid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id";
   $result = db_query_range($sql, 0, 1, array(':id' => $id));
@@ -442,7 +493,11 @@ function _ixi_upload_process_queue($id, &$context) {
         foreach ($o_result as $o_row) {
           $overrides[$o_row->field] = $o_row->value;
         }
-        $ids = array('id' => $row['id'], 'xid' => $row['xid'], 'group_nid' => $row['nid']);
+        $ids = array(
+          'id' => $row['id'],
+          'xid' => $row['xid'],
+          'group_nid' => $row['nid'],
+        );
         $context['results'][] = module_invoke_all('ixi_upload_parse_xml_file', $xml, $saved_images, $files, $ids, $overrides);
         db_update('ixi_xml_queue')
           ->fields(array(
@@ -459,6 +514,9 @@ function _ixi_upload_process_queue($id, &$context) {
   $context['message'] = t('Processing xml queue with id: @id.', array('@id' => $id));
 }
 
+/**
+ * The finished function for the process XML files batch.
+ */
 function _ixi_upload_queue_finished($success, $results, $operations) {
   if ($success) {
     drupal_set_message(t('@count files processed.', array('@count' => count($results))));
@@ -476,6 +534,9 @@ function _ixi_upload_queue_finished($success, $results, $operations) {
   }
 }
 
+/**
+ * Show a list of fields and their values from an XML file.
+ */
 function _ixi_upload_preview_fields($id) {
   $sql = "SELECT ixq.id, ixq.xid, ixq.xml, iau.nid FROM {ixi_xml_queue} ixq JOIN {ixi_archive_uploads} iau WHERE ixq.xid = iau.xid AND ixq.id = :id";
   $result = db_query_range($sql, 0, 1, array(':id' => $id));
@@ -534,12 +595,18 @@ function _ixi_upload_preview_fields($id) {
       'caption' => NULL,
       'colgroups' => array(),
       'sticky' => TRUE,
-      'empty' => t('No fields')
+      'empty' => t('No fields'),
     ));
     return array('#markup' => $table);
   }
 }
 
+/**
+ * Clean up after a batch process.
+ *
+ * This function will loop through all archives, setting the processed status
+ * to 1 for any archive where none of its children remain to be processed.
+ */
 function _ixi_upload_cleanup_queue(&$context) {
   $sql = "SELECT iau.xid FROM {ixi_archive_uploads} iau";
   $result = db_query($sql);
@@ -562,6 +629,9 @@ function _ixi_upload_cleanup_queue(&$context) {
   $context['message'] = t('Cleaning up...');
 }
 
+/**
+ * Form contructor for overriding a field preview.
+ */
 function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
   $sql = "SELECT io.value FROM {ixi_overrides} io WHERE io.oid = :oid";
   $result = db_query_range($sql, 0, 1, array(':oid' => $oid));
@@ -584,6 +654,9 @@ function _ixi_upload_preview_override_form($form, &$form_state, $oid) {
   return $form;
 }
 
+/**
+ * Submission handler for overriding a field preview.
+ */
 function _ixi_upload_preview_override_form_submit($form, &$form_state) {
   $sql = "SELECT io.id, io.value FROM {ixi_overrides} io WHERE io.oid = :oid";
   $result = db_query_range($sql, 0, 1, array(':oid' => $form_state['values']['oid']));
