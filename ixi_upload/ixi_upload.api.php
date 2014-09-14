@@ -42,7 +42,7 @@ function hook_ixi_upload_xml_alter(&$xml) {
  *   in the drupal filesystem.
  *
  * @param array $files
- *   An array of additonal files in the same folder as the XML file. These can
+ *   An array of additional files in the same folder as the XML file. These can
  *   be retrived by calling ixi_extract_to to extract the file to the public
  *   folder or ixi_extract_data to get a raw stream of the uncompressed file.
  *

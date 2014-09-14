@@ -7,7 +7,6 @@
  * Install file for the xml importer.
  */
 
-
 /**
  * Implements hook_install().
  */
