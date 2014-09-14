@@ -96,10 +96,7 @@ The function returns the path of the extracted file on the server (in case it wa
 
 ### `ixi_extract_data`
 
-You can call this function if you would like the raw data stream of a file
-from the archive. You just need to pass the xid, and the filename from the
-archive (this can be retrieved from the files array inside the parse file
-hook).
+You can call this function if you would like the raw data stream of a file from the archive. You just need to pass the xid, and the filename from the archive (this can be retrieved from the files array inside the parse file hook).
 
 #### Parameters
 
