@@ -80,8 +80,6 @@ function ixi_upload_upload_form_submit($form, &$form_state) {
     array($form_state, $file->fid),
   );
 
-  $found_files = array();
-
   $zip = new ZipArchive();
   if (($zip_return = $zip->open(drupal_realpath($file->uri))) === TRUE) {
     for ($i = 0; $i < $zip->numFiles; $i++) {
