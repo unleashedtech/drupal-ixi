@@ -4,7 +4,3 @@ core = 7.x
 package = IXI: XML Importer
 
 configure = admin/config/ixi
-
-files[] = ixi.install
-files[] = ixi.module
-files[] = ixi.admin.inc
