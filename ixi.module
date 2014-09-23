@@ -2,7 +2,7 @@
 
 /**
  * @file
- * IXI: XML Importer file
+ * IXI: XML Importer file.
  *
  * This modules allows for the upload of XML exported to create new content
  * nodes.
@@ -117,15 +117,12 @@ function ixi_cron() {
  *
  * @param int $xid
  *   The xid of the archive from which to extract.
- *
  * @param string $filename
  *   The full path of the file inside the archive. Note that this is what you
  *   get by default in the $files array in hook_ixi_upload_parse_xml_file.
- *
  * @param string $destination
  *   Where to extract the files. Defaults to 'public://' but this could also
  *   be e.g., 'private://' or some arbitrary directory inside either.
- *
  * @param bool $preserve_folder_structure
  *   Whether to preserve the internal structure of the archive when extracting
  *   the file. If true, the folders will be appended to $destination.
@@ -196,7 +193,6 @@ function ixi_extract_to($xid, $filename, $destination = 'public://', $preserve_f
  *
  * @param int $xid
  *   The xid of the archive from which to extract.
- *
  * @param string $filename
  *   The full path of the file inside the archive. Note that this is what you
  *   get by default in the $files array in hook_ixi_upload_parse_xml_file.

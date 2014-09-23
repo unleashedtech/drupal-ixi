@@ -2,7 +2,7 @@
 
 /**
  * @file
- * IXI: XML Importer Uploader file
+ * IXI: XML Importer Uploader file.
  *
  * Administration page callbacks for XML Importer Uploader.
  */
@@ -228,12 +228,12 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
           $parts = explode('/', $pathinfo['dirname']);
           $extra_extensions = (!strlen(variable_get('ixi_extra_extensions'))) ? NULL : explode(';', variable_get('ixi_extra_extensions'));
           // The images array must satisfy the following criteria:
-          //   1. Must be in the same folder as the XML.
-          //   2. Must have two parts (folder/images)
-          //   3. And the second part must be called "images".
-          //   4. There must be a file extension
-          //   5. And it must be in the list of allowed image extensions.
-          //   6. Finally, we want to exclude the Mac-specific file .DS_Store.
+          // 1. Must be in the same folder as the XML.
+          // 2. Must have two parts (folder/images)
+          // 3. And the second part must be called "images".
+          // 4. There must be a file extension
+          // 5. And it must be in the list of allowed image extensions.
+          // 6. Finally, we want to exclude the Mac-specific file .DS_Store.
           if (!strcmp($parts[0], $folder)
               && count($parts) == 2
               && !strcmp($parts[1], 'images')
@@ -244,10 +244,10 @@ function _ixi_upload_unzip_xml_file($fid, $basename, $dirname, &$context) {
             $images[] = array($i => $zipped_file['name']);
           }
           // Everything else must satisfy the following criteria:
-          //   1. Must be in the same folder as the XML.
-          //   2. There must be a file extension
-          //   3. And it must be in the list of allowed extensions.
-          //   4. Finally, we want to exlude the Mac-specific file .DS_Store.
+          // 1. Must be in the same folder as the XML.
+          // 2. There must be a file extension
+          // 3. And it must be in the list of allowed extensions.
+          // 4. Finally, we want to exlude the Mac-specific file .DS_Store.
           elseif (!strcmp($parts[0], $folder)
                   && isset($pathinfo['extension'])
                   && (!is_array($extra_extensions) || in_array($pathinfo['extension'], $extra_extensions))
