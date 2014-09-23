@@ -2,7 +2,7 @@
 
 /**
  * @file
- * IXI: XML Importer file
+ * IXI: XML Importer file.
  *
  * Administration page callbacks for IXI: XML Importer.
  */

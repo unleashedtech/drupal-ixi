@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks prvided by IXI: XML Importer Uploader
+ * Hooks prvided by IXI: XML Importer Uploader.
  */
 
 /**
@@ -10,12 +10,11 @@
  *
  * @param object $node
  *   This is the new node object that we will be saving.
- *
  * @param array $form_state
  *   This is the submitted form_state so that you can access other fields if
  *   needed.
  */
-function hook_ixi_upload_group_node_alter(&$node, $form_state) {
+function hook_ixi_upload_group_node_alter(&$node, array $form_state) {
 }
 
 /**
@@ -36,21 +35,17 @@ function hook_ixi_upload_xml_alter(&$xml) {
  *
  * @param object $xml
  *   A SimpleXml object representing the xml.
- *
  * @param array $images
  *   An array keyed by original filename in the archive with values of the file
  *   in the drupal filesystem.
- *
  * @param array $files
  *   An array of additional files in the same folder as the XML file. These can
  *   be retrived by calling ixi_extract_to to extract the file to the public
  *   folder or ixi_extract_data to get a raw stream of the uncompressed file.
- *
  * @param array $ids
  *   An array with useful ids: 'id' is the xml queue id, 'xid' is the upload id
  *   and 'group_nid' is the node id of the group node that was created when
  *   the archive was uploaded.
- *
  * @param array $overrides
  *   An array of fields as defined by the developer as keys with overridden
  *   values (only if they have actually been overridden).
@@ -60,7 +55,7 @@ function hook_ixi_upload_xml_alter(&$xml) {
  *   used for anything. One option would be to return the nid of the new node
  *   that was created. If there was an error you should return false.
  */
-function hook_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides) {
+function hook_ixi_upload_parse_xml_file($xml, array $images, array $files, array $ids, array $overrides) {
 }
 
 /**
@@ -68,7 +63,6 @@ function hook_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides)
  *
  * @param object $xml
  *   A SimpleXml object representing the the xml.
- *
  * @param array $overrides
  *   An array of fields as defined by the developer as keys with overridden
  *   values (only if they have actually been overridden).
@@ -82,5 +76,7 @@ function hook_ixi_upload_parse_xml_file($xml, $images, $files, $ids, $overrides)
  *   overrides are enabled for the field), and 'override' which is a boolean
  *   denoting whether the field can be overridden.
  */
-function hook_ixi_upload_preview_fields($xml, $overrides) {
+function hook_ixi_upload_preview_fields($xml, array $overrides) {
+  $previews = array();
+  return $previews;
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * IXI: XML Importer Uploader file
+ * IXI: XML Importer Uploader file.
  *
  * Upload and process xml archives.
  */
